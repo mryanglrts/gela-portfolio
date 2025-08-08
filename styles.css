@@ -55,20 +55,22 @@ body.night-mode .folder-label {
   color: #eee;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: #ffcdd2;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   background-color: #fff;
 }
 
 body.night-mode .close-btn {
-  color: #2f3821; /* dark green */
+  color: #2f3821;
+  /* dark green */
 }
 
 body.night-mode .close-btn:hover {
-  color: #ff8a9e; /* soft pink on hover, optional */
+  color: #ff8a9e;
+  /* soft pink on hover, optional */
 }
 
 
@@ -112,11 +114,27 @@ body.night-mode .close-btn:hover {
 }
 
 @keyframes wave {
-  0%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(14deg); }
-  40% { transform: rotate(-8deg); }
-  60% { transform: rotate(14deg); }
-  80% { transform: rotate(-4deg); }
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  20% {
+    transform: rotate(14deg);
+  }
+
+  40% {
+    transform: rotate(-8deg);
+  }
+
+  60% {
+    transform: rotate(14deg);
+  }
+
+  80% {
+    transform: rotate(-4deg);
+  }
 }
 
 
@@ -158,9 +176,10 @@ body.night-mode .close-btn:hover {
   right: 0;
   bottom: 0;
   transition: 0.4s;
+
   .slider {
-  pointer-events: none;
-}
+    pointer-events: none;
+  }
 
 }
 
@@ -176,11 +195,11 @@ body.night-mode .close-btn:hover {
   border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: #ffb6c1;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(22px);
 }
 
@@ -199,7 +218,9 @@ input:checked + .slider:before {
    FOLDERS
 -------------------- */
 
-.folder, .folder-wrapper, .window {
+.folder,
+.folder-wrapper,
+.window {
   -webkit-user-drag: none;
   user-select: none;
 }
@@ -219,7 +240,7 @@ input:checked + .slider:before {
   width: 100px;
   height: auto;
   cursor: pointer;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
   transition: filter 0.2s ease;
 }
 
@@ -230,11 +251,12 @@ input:checked + .slider:before {
   text-align: center;
   line-height: 1;
   font-family: 'DM Sans', sans-serif;
-  pointer-events: none; /* optional: so label doesn’t interfere with click */
+  pointer-events: none;
+  /* optional: so label doesn’t interfere with click */
 }
 
 .folder:hover {
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
 }
 
 
@@ -244,22 +266,30 @@ input:checked + .slider:before {
    WINDOWS
 -------------------- */
 .window {
-   position: absolute;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 600px;
-  background: #ffcdd2; /* soft pink */
+  background: #ffcdd2;
+  /* soft pink */
   border: 1px solid #333;
   border-radius: 4px;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   animation: pop 0.3s ease;
 }
 
 @keyframes pop {
-  0% { transform: scale(0.9); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .close-btn {
@@ -281,7 +311,8 @@ input:checked + .slider:before {
 
 
 .window-header {
-  background-color: #2f3821; /* dark green */
+  background-color: #2f3821;
+  /* dark green */
   color: white;
   font-family: 'Nekoya', sans-serif;
   padding: 10px;
@@ -293,7 +324,8 @@ input:checked + .slider:before {
 
 
 .window-content.home-content {
-  background-color: #ffcdd2; /* light pink */
+  background-color: #ffcdd2;
+  /* light pink */
   text-align: center;
   padding: 3rem 2rem 2.5rem;
   display: flex;
@@ -307,7 +339,8 @@ input:checked + .slider:before {
   font-size: 3rem;
   color: #2f3821;
   margin: 0;
-  margin-bottom: 0.2rem; /* NEW! This gives it just a lil space from subtitle */
+  margin-bottom: 0.2rem;
+  /* NEW! This gives it just a lil space from subtitle */
 }
 
 
@@ -321,21 +354,26 @@ input:checked + .slider:before {
 .angela-inline {
   width: 260px;
   height: auto;
-  margin-bottom: -2rem; /* Add a soft space below the illustration */
+  margin-bottom: -2rem;
+  /* Add a soft space below the illustration */
 }
 
 body.night-mode .window-content.home-content {
-  background-color: #2f3821; /* deep green */
+  background-color: #2f3821;
+  /* deep green */
   color: #f0e4ec;
 }
 
 body.night-mode .window-header {
-  background-color: #ffcdd2; /* soft pink */
-  color: #2f3821; /* dark green text */
+  background-color: #ffcdd2;
+  /* soft pink */
+  color: #2f3821;
+  /* dark green text */
 }
 
 body.night-mode .window-content.home-content h1 {
-  color: #f0e4ec; /* soft pink or any light color you like */
+  color: #f0e4ec;
+  /* soft pink or any light color you like */
 }
 
 body.night-mode .window-content.home-content .subtitle {
@@ -374,7 +412,7 @@ body.night-mode .window-content.home-content .subtitle {
   font-family: 'DM Sans', sans-serif;
   padding: 6px 10px;
   border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease, transform 0.4s ease;
@@ -462,7 +500,7 @@ body.night-mode .angela-bubble {
   margin: 1.5rem 0;
   border: none;
   border-top: 1px solid #ccc;
-  
+
 }
 
 .about-description p {
@@ -501,7 +539,8 @@ body.night-mode .about-description a {
 }
 
 body.night-mode .edu-title {
-  color: #f0e4ec; /* or any light/pastel color you love */
+  color: #f0e4ec;
+  /* or any light/pastel color you love */
 }
 
 
@@ -522,11 +561,12 @@ body.night-mode .edu-title {
 }
 
 body.night-mode .highlight-text {
-  color: #f0e4ec; 
+  color: #f0e4ec;
 }
 
-.about-languages p + p {
-  margin-top: 0.75em; /* space between first and second paragraph */
+.about-languages p+p {
+  margin-top: 0.75em;
+  /* space between first and second paragraph */
 }
 
 
@@ -534,9 +574,10 @@ body.night-mode .highlight-text {
 /* CONTACT WINDOW PANEL */
 .contact-window {
   text-align: center;
-  padding: 24px 20px; /* slightly less padding to tighten all content */
+  padding: 24px 20px;
+  /* slightly less padding to tighten all content */
   border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 /* Light mode = pink panel, olive-ish text */
@@ -556,7 +597,8 @@ body.night-mode .highlight-text {
   font-weight: 700;
   font-size: clamp(1.6rem, 3vw, 2.2rem);
   letter-spacing: 0.5px;
-  margin: 4px 0 8px; /* tighter gap to desc */
+  margin: 4px 0 8px;
+  /* tighter gap to desc */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -565,7 +607,8 @@ body.night-mode .highlight-text {
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 0.98rem;
   line-height: 1.5;
-  margin: 0 auto 0px; /* less gap below */
+  margin: 0 auto 0px;
+  /* less gap below */
   max-width: 54ch;
   opacity: 0.95;
 }
@@ -574,7 +617,8 @@ body.night-mode .highlight-text {
   width: 50%;
   height: auto;
   display: block;
-  margin: 2px auto 4px; /* tighter top/bottom spacing */
+  margin: 2px auto 4px;
+  /* tighter top/bottom spacing */
   transform: none;
 }
 
@@ -582,7 +626,8 @@ body.night-mode .highlight-text {
 .contact-email {
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 0.98rem;
-  margin: 2px 0 4px; /* close to illustration + note */
+  margin: 2px 0 4px;
+  /* close to illustration + note */
 }
 
 .contact-email a {
@@ -591,7 +636,8 @@ body.night-mode .highlight-text {
 
 .contact-note {
   font-size: 0.9rem;
-  margin: 0 0 6px; /* small gap before button */
+  margin: 0 0 6px;
+  /* small gap before button */
 }
 
 /* Light mode accents */
@@ -600,8 +646,10 @@ body.night-mode .highlight-text {
 }
 
 .day-mode .contact-btn {
-  background: #2b2f20; /* dark green */
-  color: #ffffff;      /* white text */
+  background: #2b2f20;
+  /* dark green */
+  color: #ffffff;
+  /* white text */
   border: 1px solid #2b2f20;
 }
 
@@ -611,15 +659,18 @@ body.night-mode .highlight-text {
 }
 
 .night-mode .contact-btn {
-  background: #ffd6e3; /* pink */
-  color: #223321;      /* dark green text */
+  background: #ffd6e3;
+  /* pink */
+  color: #223321;
+  /* dark green text */
   border: 1px solid #ffd6e3;
 }
 
 /* Button base */
 .contact-btn {
   display: inline-block;
-  margin-top: 20px; /* minimal gap from text above */
+  margin-top: 20px;
+  /* minimal gap from text above */
   padding: 10px 18px;
   border-radius: 8px;
   font-weight: 700;
@@ -627,11 +678,14 @@ body.night-mode .highlight-text {
   transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.2s;
 }
 
-.contact-btn:hover { transform: translateY(-1px); }
+.contact-btn:hover {
+  transform: translateY(-1px);
+}
+
 .contact-btn:active {
   transform: translateY(0);
   opacity: 0.9;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* ===== FAQ: structure & rhythm ===== */
@@ -643,18 +697,21 @@ body.night-mode .highlight-text {
 .faq-item {
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   transition: border-color .2s ease, box-shadow .2s ease;
 }
 
 /* Light / Dark card backgrounds */
 .day-mode .faq-item {
-  background: #fff4e0; /* warm cream (works with your light theme) */
-  border-color: rgba(0,0,0,0.08);
+  background: #fff4e0;
+  /* warm cream (works with your light theme) */
+  border-color: rgba(0, 0, 0, 0.08);
 }
+
 .night-mode .faq-item {
-  background: #2a3927; /* moss tint */
-  border-color: rgba(255,255,255,0.10);
+  background: #2a3927;
+  /* moss tint */
+  border-color: rgba(255, 255, 255, 0.10);
 }
 
 /* ===== Question row ===== */
@@ -675,8 +732,13 @@ body.night-mode .highlight-text {
 }
 
 /* Text colors */
-.day-mode .faq-q { color: #2b2f20; }
-.night-mode .faq-q { color: #ffeef3; }
+.day-mode .faq-q {
+  color: #2b2f20;
+}
+
+.night-mode .faq-q {
+  color: #ffeef3;
+}
 
 /* Hover/focus affordance */
 .faq-q:focus-visible {
@@ -684,18 +746,26 @@ body.night-mode .highlight-text {
   outline-offset: 2px;
   border-radius: 8px;
 }
-.day-mode .faq-q:hover { background: rgba(0,0,0,0.04); }
-.night-mode .faq-q:hover { background: rgba(255,255,255,0.06); }
+
+.day-mode .faq-q:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.night-mode .faq-q:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
 
 /* ===== Chevron ===== */
 .faq-q .chev {
-  width: 10px; height: 10px;
+  width: 10px;
+  height: 10px;
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
   transform: rotate(45deg);
   transition: transform .18s ease;
   flex: 0 0 auto;
 }
+
 .faq-item.open .faq-q .chev {
   transform: rotate(-135deg);
 }
@@ -708,26 +778,47 @@ body.night-mode .highlight-text {
   will-change: max-height;
   background: transparent;
 }
+
 .faq-a-inner {
   padding: 12px 16px 16px;
   font-size: .96rem;
   line-height: 1.6;
 }
-.day-mode .faq-a-inner { color: #2b2f20; }
-.night-mode .faq-a-inner { color: #ffeef3; }
+
+.day-mode .faq-a-inner {
+  color: #2b2f20;
+}
+
+.night-mode .faq-a-inner {
+  color: #ffeef3;
+}
 
 /* Lists inside answers */
-.faq-a-inner ul { margin: 0; padding-left: 20px; }
-.faq-a-inner li { margin: 4px 0; }
+.faq-a-inner ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.faq-a-inner li {
+  margin: 4px 0;
+}
 
 /* Links inside answers */
-.faq-a-inner a { text-decoration: underline; }
-.day-mode .faq-a-inner a { color: #8f3d00; }
-.night-mode .faq-a-inner a { color: #ffd6e3; }
+.faq-a-inner a {
+  text-decoration: underline;
+}
+
+.day-mode .faq-a-inner a {
+  color: #8f3d00;
+}
+
+.night-mode .faq-a-inner a {
+  color: #ffd6e3;
+}
 
 /* Slight lift on open */
 .faq-item.open {
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .faq-item.open .faq-a-inner {
@@ -741,38 +832,48 @@ body.night-mode .highlight-text {
 
 /* Question row background + text */
 .day-mode .faq-q {
-  background-color: #2b2f20; /* dark green */
-  color: #ffeef3; /* light text */
+  background-color: #2b2f20;
+  /* dark green */
+  color: #ffeef3;
+  /* light text */
 }
 
 .night-mode .faq-q {
-  background-color: #fbcdd5; /* light pink */
-  color: #2b2f20; /* dark green text */
+  background-color: #fbcdd5;
+  /* light pink */
+  color: #2b2f20;
+  /* dark green text */
 }
 
 /* Hover colors */
 .day-mode .faq-q:hover {
-  background-color: #38412b; /* slightly lighter green */
+  background-color: #38412b;
+  /* slightly lighter green */
 }
 
 .night-mode .faq-q:hover {
-  background-color: #f9bfc9; /* slightly darker pink */
+  background-color: #f9bfc9;
+  /* slightly darker pink */
 }
 
 /* Answer background override */
 .day-mode .faq-a-inner {
   background-color: #fbcdd5 !important;
-  color: #2b2f20; /* dark green text */
+  color: #2b2f20;
+  /* dark green text */
 }
 
 .night-mode .faq-a-inner {
   background-color: #2b2f20 !important;
-  color: #ffeef3; /* light text */
+  color: #ffeef3;
+  /* light text */
 }
 
 
 /* container spacing */
-.works { padding: 8px 12px 18px; }
+.works {
+  padding: 8px 12px 18px;
+}
 
 /* banner */
 .works-banner {
@@ -781,15 +882,35 @@ body.night-mode .highlight-text {
   margin: 8px 0 18px;
   font-size: .96rem;
 }
-.works-banner .works-sub { opacity: .9; margin-top: 4px; }
-.works-banner a { text-decoration: underline; }
+
+.works-banner .works-sub {
+  opacity: .9;
+  margin-top: 4px;
+}
+
+.works-banner a {
+  text-decoration: underline;
+}
 
 /* light/dark theming */
-.day-mode .works-banner { background: #fff0b8; color: #2b2f20; }  /* a soft cream notice */
-.night-mode .works-banner { background: #394530; color: #ffeef3; }
+.day-mode .works-banner {
+  background: #fff0b8;
+  color: #2b2f20;
+}
 
-.day-mode .works h3 { color: #2b2f20; }
-.night-mode .works h3 { color: #ffeef3; }
+/* a soft cream notice */
+.night-mode .works-banner {
+  background: #394530;
+  color: #ffeef3;
+}
+
+.day-mode .works h3 {
+  color: #2b2f20;
+}
+
+.night-mode .works h3 {
+  color: #ffeef3;
+}
 
 /* chips */
 .works-chips {
@@ -797,25 +918,37 @@ body.night-mode .highlight-text {
   gap: 18px;
   grid-template-columns: 1fr 1fr;
 }
-@media (max-width: 720px) { .works-chips { grid-template-columns: 1fr; } }
 
-.chip-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 720px) {
+  .works-chips {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
 .chip {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 999px; /* perfect pill */
+  border-radius: 999px;
+  /* perfect pill */
   font-size: .88rem;
   font-weight: 500;
   border: 1px solid;
   white-space: nowrap;
-  background: #fff; /* or your light-mode chip bg */
+  background: #fff;
+  /* or your light-mode chip bg */
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 /* Title → chips spacing */
 .works-chips section h3 {
-  margin: 12px 0 8px;   /* top, sides, bottom */
+  margin: 12px 0 8px;
+  /* top, sides, bottom */
 }
 
 /* Extra breathing room above the chip rows */
@@ -832,19 +965,19 @@ body.night-mode .highlight-text {
 
 .day-mode .chip {
   background: #fff;
-  border-color: rgba(0,0,0,.15);
+  border-color: rgba(0, 0, 0, .15);
   color: #2b2f20;
 }
 
 .night-mode .chip {
   background: #2b2f20;
-  border-color: rgba(255,255,255,.15);
+  border-color: rgba(255, 255, 255, .15);
   color: #ffeef3;
 }
 
 .chip:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
 
@@ -864,20 +997,35 @@ body.night-mode .highlight-text {
 
 /* Nudge the grid away from the title a bit more */
 .works-section .card-grid {
-  margin-top: 6px;      /* bump this up/down to taste */
-  gap: 16px;            /* space between cards */
+  margin-top: 6px;
+  /* bump this up/down to taste */
+  gap: 16px;
+  /* space between cards */
 }
 
 /* If you’re using the divider line */
 .works-rule {
-  margin: 18px 0;       /* space above/below the <hr> */
+  margin: 18px 0;
+  /* space above/below the <hr> */
 }
 
 
 /* sections + cards */
-.works-section { margin-top: 8px; }
-.card-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0,1fr)); }
-@media (max-width: 900px) { .card-grid { grid-template-columns: 1fr; } }
+.works-section {
+  margin-top: 8px;
+}
+
+.card-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 .card {
   display: block;
@@ -887,54 +1035,80 @@ body.night-mode .highlight-text {
   text-decoration: none;
   transition: transform .12s ease, box-shadow .12s ease;
 }
-.day-mode .card { background: #fff; border-color: rgba(0,0,0,.12); color: #2b2f20; }
-.night-mode .card { background: #223321; border-color: rgba(255,255,255,.12); color: #ffeef3; }
 
-.card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+.day-mode .card {
+  background: #fff;
+  border-color: rgba(0, 0, 0, .12);
+  color: #2b2f20;
+}
+
+.night-mode .card {
+  background: #223321;
+  border-color: rgba(255, 255, 255, .12);
+  color: #ffeef3;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .12);
+}
 
 .thumb {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(0,0,0,.08), rgba(0,0,0,.08) 12px,
-    transparent 12px, transparent 24px
-  );
+  background: repeating-linear-gradient(45deg,
+      rgba(0, 0, 0, .08), rgba(0, 0, 0, .08) 12px,
+      transparent 12px, transparent 24px);
 }
+
 .night-mode .thumb {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(255,255,255,.08), rgba(255,255,255,.08) 12px,
-    transparent 12px, transparent 24px
-  );
+  background: repeating-linear-gradient(45deg,
+      rgba(255, 255, 255, .08), rgba(255, 255, 255, .08) 12px,
+      transparent 12px, transparent 24px);
 }
-.card-title { padding: 10px 12px; font-weight: 700; }
+
+.card-title {
+  padding: 10px 12px;
+  font-weight: 700;
+}
 
 /* window body background parity (optional)
    if you want the works content panel to use your pink: */
-.day-mode .works { background: #fbcdd5; border-radius: 10px; }
+.day-mode .works {
+  background: #fbcdd5;
+  border-radius: 10px;
+}
 
 
 /* Banner color swap */
 .day-mode .works-banner {
-  background: #2b2f20; /* moss green */
-  color: #ffeef3; /* light pink text */
+  background: #2b2f20;
+  /* moss green */
+  color: #ffeef3;
+  /* light pink text */
 }
+
 .day-mode .works-banner a {
-  color: #fbcdd5; /* soft pink for link */
+  color: #fbcdd5;
+  /* soft pink for link */
 }
 
 .night-mode .works-banner {
-  background: #fbcdd5; /* your pink */
-  color: #2b2f20; /* moss text */
+  background: #fbcdd5;
+  /* your pink */
+  color: #2b2f20;
+  /* moss text */
 }
+
 .night-mode .works-banner a {
-  color: #2b2f20; /* moss for link too */
+  color: #2b2f20;
+  /* moss for link too */
 }
 
 /* === Compact cards – overrides === */
 .works .card-grid {
-  gap: 10px;                                   /* tighter spacing */
+  gap: 10px;
+  /* tighter spacing */
 }
 
 /* smaller boxes */
@@ -945,7 +1119,8 @@ body.night-mode .highlight-text {
 
 /* shorter thumbnail area */
 .works .thumb {
-  aspect-ratio: 21 / 10;                        /* was 16/9 → shorter height */
+  aspect-ratio: 21 / 10;
+  /* was 16/9 → shorter height */
   /* OR, if you prefer fixed height instead of aspect ratio: */
   /* height: 120px; aspect-ratio: auto; */
 }
@@ -959,8 +1134,16 @@ body.night-mode .highlight-text {
 
 /* mobile: keep them readable */
 @media (max-width: 900px) {
-  .works .card-grid { gap: 12px; }
-  .works .thumb { height: 140px; aspect-ratio: auto; } /* slightly taller on small screens */
+  .works .card-grid {
+    gap: 12px;
+  }
+
+  .works .thumb {
+    height: 140px;
+    aspect-ratio: auto;
+  }
+
+  /* slightly taller on small screens */
 }
 
 
@@ -968,6 +1151,7 @@ body.night-mode .highlight-text {
 
 /* 🌸 MOBILE RESPONSIVE FIXES */
 @media (max-width: 768px) {
+
   /* Make folders smaller and arranged vertically */
   .folder-wrapper {
     transform: scale(0.8);
@@ -1012,15 +1196,39 @@ body.night-mode .highlight-text {
 }
 
 /* Links window */
-.links-window { padding: 8px 12px 16px; }
+.links-window {
+  padding: 8px 12px 16px;
+}
+
+.day-mode .links-window {
+  background: #f8c9d0;
+  /* light pink */
+  color: #2b2f20;
+}
+
+.night-mode .links-window {
+  background: #223321;
+  /* deep green */
+  color: #ffeef3;
+}
 
 .link-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px 24px;
 }
-@media (max-width: 900px) { .link-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 640px) { .link-grid { grid-template-columns: repeat(2, 1fr); } }
+
+@media (max-width: 900px) {
+  .link-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .link-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
 .link-card {
   text-decoration: none;
@@ -1033,19 +1241,33 @@ body.night-mode .highlight-text {
   transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
 }
 
-.day-mode .link-card { color: #2b2f20; background: rgba(255,255,255,0.6); }
-.night-mode .link-card { color: #ffeef3; background: rgba(34,51,33,0.7); }
+.day-mode .link-card {
+  color: #2b2f20;
+  background: #f8c9d0(255, 255, 255, 0.6);
+}
+
+.night-mode .link-card {
+  color: #ffeef3;
+  background: rgba(34, 51, 33, 0.7);
+}
 
 .link-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .12);
 }
 
 .link-icon img {
-  width: 64px; height: 64px; object-fit: contain; display: block;
-  filter: drop-shadow(2px 3px 0 rgba(0,0,0,.15));
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, .15));
 }
-.link-label { font-weight: 700; font-size: .95rem; }
+
+.link-label {
+  font-weight: 700;
+  font-size: .95rem;
+}
 
 .links-note {
   margin: 18px auto 0;
@@ -1055,8 +1277,17 @@ body.night-mode .highlight-text {
   font-size: .9rem;
 }
 
-.day-mode .links-note { background: #ffffff; color: #2b2f20; opacity: .9; }
-.night-mode .links-note { background: #2b2f20; color: #ffeef3; opacity: .9; }
+.day-mode .links-note {
+  background: #ffffff;
+  color: #2b2f20;
+  opacity: .9;
+}
+
+.night-mode .links-note {
+  background: #2b2f20;
+  color: #ffeef3;
+  opacity: .9;
+}
 
 
 /* Ambient FX layer (behind windows, above wallpaper) */
@@ -1064,7 +1295,8 @@ body.night-mode .highlight-text {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 5;           /* your windows go 100+, so this stays behind them */
+  z-index: 5;
+  /* your windows go 100+, so this stays behind them */
   overflow: hidden;
 }
 
@@ -1074,17 +1306,28 @@ body.night-mode .highlight-text {
   width: 2px;
   height: 2px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   opacity: 0.2;
-  filter: drop-shadow(0 0 4px rgba(255,255,255,0.6));
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
   animation: twinkle var(--twinkle-dur, 4s) ease-in-out var(--twinkle-delay, 0s) infinite;
   will-change: opacity, transform;
 }
 
 @keyframes twinkle {
-  0%   { opacity: 0.1; transform: scale(0.9); }
-  50%  { opacity: 1;   transform: scale(1); }
-  100% { opacity: 0.2; transform: scale(0.95); }
+  0% {
+    opacity: 0.1;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0.2;
+    transform: scale(0.95);
+  }
 }
 
 /* ========= Light mode: flowers (fixed) ========= */
@@ -1101,16 +1344,36 @@ body.night-mode .highlight-text {
 
 .ambient-flowers .petal::before {
   content: "✿";
-  color: #f39bb2; /* tweak if you want more contrast on your pink */
-  text-shadow: 0 0 4px rgba(243,155,178,.35);
+  color: #f39bb2;
+  /* tweak if you want more contrast on your pink */
+  text-shadow: 0 0 4px rgba(243, 155, 178, .35);
 }
 
 /* single animation: combines falling + swaying + rotation */
 @keyframes petal-drift {
-  0%   { transform: translate(-12px, -10vh) rotate(0deg);    opacity: 0; }
-  5%   { opacity: 0.95; }
-  25%  { transform: translate( 12px, 25vh)  rotate(120deg);  }
-  50%  { transform: translate(-12px, 55vh)  rotate(240deg);  }
-  75%  { transform: translate( 12px, 85vh)  rotate(320deg);  }
-  100% { transform: translate(-12px, 110vh) rotate(360deg);  opacity: 0.95; }
+  0% {
+    transform: translate(-12px, -10vh) rotate(0deg);
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 0.95;
+  }
+
+  25% {
+    transform: translate(12px, 25vh) rotate(120deg);
+  }
+
+  50% {
+    transform: translate(-12px, 55vh) rotate(240deg);
+  }
+
+  75% {
+    transform: translate(12px, 85vh) rotate(320deg);
+  }
+
+  100% {
+    transform: translate(-12px, 110vh) rotate(360deg);
+    opacity: 0.95;
+  }
 }

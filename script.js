@@ -15,81 +15,81 @@ document.addEventListener("DOMContentLoaded", () => {
   let highestZIndex = 100;
 
   // Create ambient layer if missing
-function ensureAmbientLayer() {
-  let ambient = document.getElementById('ambient');
-  if (!ambient) {
-    ambient = document.createElement('div');
-    ambient.id = 'ambient';
-    (document.getElementById('desktop') || document.body).appendChild(ambient);
+  function ensureAmbientLayer() {
+    let ambient = document.getElementById('ambient');
+    if (!ambient) {
+      ambient = document.createElement('div');
+      ambient.id = 'ambient';
+      (document.getElementById('desktop') || document.body).appendChild(ambient);
+    }
+    return ambient;
   }
-  return ambient;
-}
 
-function clearAmbient() {
-  const ambient = ensureAmbientLayer();
-  ambient.className = "";
-  ambient.innerHTML = "";
-}
-
-/* ===== Night: twinkling stars ===== */
-function createStars(count = 70) {
-  const ambient = ensureAmbientLayer();
-  clearAmbient();
-  ambient.classList.add('ambient-stars');
-
-  for (let i = 0; i < count; i++) {
-    const s = document.createElement('span');
-    s.className = 'star';
-    const size = Math.random() * 2 + 1;                // 1–3 px
-    const x = Math.random() * 100;                     // %
-    const y = Math.random() * 100;                     // %
-    const delay = (Math.random() * 4).toFixed(2) + 's';
-    const dur = (3 + Math.random() * 3).toFixed(2) + 's';
-
-    s.style.left = x + 'vw';
-    s.style.top = y + 'vh';
-    s.style.width = size + 'px';
-    s.style.height = size + 'px';
-    s.style.setProperty('--twinkle-delay', delay);
-    s.style.setProperty('--twinkle-dur', dur);
-
-    ambient.appendChild(s);
+  function clearAmbient() {
+    const ambient = ensureAmbientLayer();
+    ambient.className = "";
+    ambient.innerHTML = "";
   }
-}
 
-/* ===== Light: drifting flowers ===== */
-function createFlowers(count = 24) {
-  const ambient = ensureAmbientLayer();
-  clearAmbient();
-  ambient.classList.add('ambient-flowers');
+  /* ===== Night: twinkling stars ===== */
+  function createStars(count = 70) {
+    const ambient = ensureAmbientLayer();
+    clearAmbient();
+    ambient.classList.add('ambient-stars');
 
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement('span');
-    p.className = 'petal';
-    const left = Math.random() * 100;                  // %
-    const delay = (-Math.random() * 12).toFixed(2) + 's'; // negative for stagger
-    const fall = (12 + Math.random() * 10).toFixed(2) + 's';
-    const sway = (5 + Math.random() * 4).toFixed(2) + 's';
-    const size = (14 + Math.random() * 12).toFixed(0) + 'px';
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('span');
+      s.className = 'star';
+      const size = Math.random() * 2 + 1; // 1–3 px
+      const x = Math.random() * 100; // %
+      const y = Math.random() * 100; // %
+      const delay = (Math.random() * 4).toFixed(2) + 's';
+      const dur = (3 + Math.random() * 3).toFixed(2) + 's';
 
-    p.style.setProperty('--x', left + 'vw');
-    p.style.setProperty('--delay', delay);
-    p.style.setProperty('--fall-dur', fall);
-    p.style.setProperty('--sway-dur', sway);
-    p.style.setProperty('--size', size);
+      s.style.left = x + 'vw';
+      s.style.top = y + 'vh';
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      s.style.setProperty('--twinkle-delay', delay);
+      s.style.setProperty('--twinkle-dur', dur);
 
-    ambient.appendChild(p);
+      ambient.appendChild(s);
+    }
   }
-}
 
-/* Decide which effect based on current theme */
-function refreshAmbientFX() {
-  if (document.body.classList.contains('night-mode')) {
-    createStars();
-  } else {
-    createFlowers();
+  /* ===== Light: drifting flowers ===== */
+  function createFlowers(count = 24) {
+    const ambient = ensureAmbientLayer();
+    clearAmbient();
+    ambient.classList.add('ambient-flowers');
+
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('span');
+      p.className = 'petal';
+      const left = Math.random() * 100; // %
+      const delay = (-Math.random() * 12).toFixed(2) + 's'; // negative for stagger
+      const fall = (12 + Math.random() * 10).toFixed(2) + 's';
+      const sway = (5 + Math.random() * 4).toFixed(2) + 's';
+      const size = (14 + Math.random() * 12).toFixed(0) + 'px';
+
+      p.style.setProperty('--x', left + 'vw');
+      p.style.setProperty('--delay', delay);
+      p.style.setProperty('--fall-dur', fall);
+      p.style.setProperty('--sway-dur', sway);
+      p.style.setProperty('--size', size);
+
+      ambient.appendChild(p);
+    }
   }
-}
+
+  /* Decide which effect based on current theme */
+  function refreshAmbientFX() {
+    if (document.body.classList.contains('night-mode')) {
+      createStars();
+    } else {
+      createFlowers();
+    }
+  }
 
 
   // Centered-but-staggered offsets
@@ -160,9 +160,9 @@ function refreshAmbientFX() {
       // Update contact window illustration if open
       const contactIllu = document.querySelector("#window-contact .contact-illustration");
       if (contactIllu) {
-        contactIllu.src = isNight
-          ? "images/angela-dark-heart.svg"
-          : "images/angela-light-heart.svg";
+        contactIllu.src = isNight ?
+          "images/angela-dark-heart.svg" :
+          "images/angela-light-heart.svg";
       }
 
       // 🔁 Update link icons in the Links window (if it's open)
@@ -174,8 +174,7 @@ function refreshAmbientFX() {
      🌸 FAQ HELPERS (behavior only)
      =============================== */
   function getFaqContent() {
-    const items = [
-      {
+    const items = [{
         q: "what software do you use?",
         a: `
           <ul>
@@ -186,10 +185,22 @@ function refreshAmbientFX() {
           </ul>
         `
       },
-      { q: "what are your rates?", a: "i'm currently at 10-12$/hour!" },
-      { q: "what languages do you usually use?", a: "html, css, js, and nodereact!" },
-      { q: "where do you get your sound effects?", a: "free libraries, paid packs, and sometimes i record my own." },
-      { q: "do you draw?", a: "yes! im actually saving up for an ipad to create more illustrations :3" }
+      {
+        q: "what are your rates?",
+        a: "i'm currently at 10-12$/hour!"
+      },
+      {
+        q: "what languages do you usually use?",
+        a: "html, css, js, and nodereact!"
+      },
+      {
+        q: "where do you get your sound effects?",
+        a: "free libraries, paid packs, and sometimes i record my own."
+      },
+      {
+        q: "do you draw?",
+        a: "yes! im actually saving up for an ipad to create more illustrations :3"
+      }
     ];
 
     return `
@@ -221,7 +232,7 @@ function refreshAmbientFX() {
           if (o !== it) {
             o.classList.remove("open");
             o.querySelector(".faq-a").style.maxHeight = null;
-            o.querySelector(".faq-q").setAttribute("aria-expanded","false");
+            o.querySelector(".faq-q").setAttribute("aria-expanded", "false");
           }
         });
         // toggle this
@@ -236,11 +247,22 @@ function refreshAmbientFX() {
   function getLinksContent() {
     const isDarkMode = document.body.classList.contains('night-mode');
 
-    const links = [
-      { href: "https://twitter.com/mryanglrts",   name: "twitter"   },
-      { href: "https://facebook.com/assistwithmva",  name: "facebook"  },
-      { href: "https://instagram.com/gelatisimeri", name: "instagram" },
-      { href: "https://discord.com/users/848336476969369610",    name: "discord"   }
+    const links = [{
+        href: "https://twitter.com/mryanglrts",
+        name: "twitter"
+      },
+      {
+        href: "https://facebook.com/assistwithmva",
+        name: "facebook"
+      },
+      {
+        href: "https://instagram.com/gelatisimeri",
+        name: "instagram"
+      },
+      {
+        href: "https://discord.com/users/848336476969369610",
+        name: "discord"
+      }
     ];
 
     return `
@@ -339,8 +361,7 @@ function refreshAmbientFX() {
   }
 
   // 📁 Folder data
-  const folderData = [
-    {
+  const folderData = [{
       id: "works",
       label: "my works",
       x: 100,
@@ -381,12 +402,12 @@ function refreshAmbientFX() {
       y: 160,
       content: getLinksContent()
     },
-   {
-  id: "about",
-  label: "about me",
-  x: 1600,
-  y: 420,
-  content: `
+    {
+      id: "about",
+      label: "about me",
+      x: 1600,
+      y: 420,
+      content: `
     <div class="about-angela-wrapper">
       <div class="about-header">
         <img src="images/angela-dark-woah.svg" class="about-img" />
@@ -442,7 +463,7 @@ function refreshAmbientFX() {
       </div>
     </div>
   `
-}
+    }
   ];
 
   // 🗂️ Create folders on screen
@@ -456,9 +477,9 @@ function refreshAmbientFX() {
 
       const folderImg = document.createElement("img");
       folderImg.classList.add("folder");
-      folderImg.src = body.classList.contains("night-mode")
-        ? "images/folder-dark.svg"
-        : "images/folder-light.svg";
+      folderImg.src = body.classList.contains("night-mode") ?
+        "images/folder-dark.svg" :
+        "images/folder-light.svg";
       folderImg.setAttribute("draggable", "false"); // prevent native img drag
 
       const label = document.createElement("div");
@@ -491,32 +512,32 @@ function refreshAmbientFX() {
 
       if (angelaClickCount > 14) {
         angelaClickCount = 0;
-        angelaIllustration.src = isNight
-          ? "images/angela-dark.svg"
-          : "images/angela-light.svg";
+        angelaIllustration.src = isNight ?
+          "images/angela-dark.svg" :
+          "images/angela-light.svg";
         showAngelaBubble("i'm okay i guess..");
         return;
       }
 
       if (angelaClickCount >= 9) {
-        angelaIllustration.src = isNight
-          ? "images/angela-dark-cry.svg"
-          : "images/angela-light-cry.svg";
+        angelaIllustration.src = isNight ?
+          "images/angela-dark-cry.svg" :
+          "images/angela-light-cry.svg";
         showAngelaBubble("stop it....i'm overstimulated!");
         return;
       }
 
       if (angelaClickCount >= 5) {
-        angelaIllustration.src = isNight
-          ? "images/angela-dark-angry.svg"
-          : "images/angela-light-angry.svg";
+        angelaIllustration.src = isNight ?
+          "images/angela-dark-angry.svg" :
+          "images/angela-light-angry.svg";
         showAngelaBubble("you can stop now.");
         return;
       }
 
-      angelaIllustration.src = isNight
-        ? "images/angela-dark-smile.svg"
-        : "images/angela-light-smile.svg";
+      angelaIllustration.src = isNight ?
+        "images/angela-dark-smile.svg" :
+        "images/angela-light-smile.svg";
       showAngelaBubble("you actually clicked me!");
 
       document.querySelectorAll(".folder-wrapper").forEach(folder => {
@@ -566,11 +587,11 @@ function refreshAmbientFX() {
     nextOffsetIndex++;
 
     let left = baseX + dx;
-    let top  = baseY + dy;
+    let top = baseY + dy;
 
     // clamp to viewport
     left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
-    top  = Math.max(margin, Math.min(top,  window.innerHeight - h - margin));
+    top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
 
     win.style.left = `${left}px`;
     win.style.top = `${top}px`;
@@ -602,8 +623,10 @@ function refreshAmbientFX() {
   function makeDraggable(el) {
     let pressed = false;
     let dragging = false;
-    let startX = 0, startY = 0;
-    let offsetX = 0, offsetY = 0;
+    let startX = 0,
+      startY = 0;
+    let offsetX = 0,
+      offsetY = 0;
     const THRESHOLD = 8;
 
     el.addEventListener("mousedown", (e) => {
@@ -634,7 +657,7 @@ function refreshAmbientFX() {
         newTop = Math.max(0, Math.min(newTop, window.innerHeight - el.offsetHeight));
 
         el.style.left = `${newLeft}px`;
-        el.style.top  = `${newTop}px`;
+        el.style.top = `${newTop}px`;
       }
     });
 
@@ -643,7 +666,9 @@ function refreshAmbientFX() {
       pressed = false;
       el.style.transition = "all 0.4s ease";
       el.__dragMoved = dragging;
-      setTimeout(() => { el.__dragMoved = false; }, 0);
+      setTimeout(() => {
+        el.__dragMoved = false;
+      }, 0);
     });
   }
 
