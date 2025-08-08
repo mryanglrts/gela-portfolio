@@ -1377,3 +1377,66 @@ body.night-mode .highlight-text {
     opacity: 0.95;
   }
 }
+
+/* Corner cat button */
+#corner-cat {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 150px;               /* tweak size here */
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 90;               /* windows use 100+, so they can overlap the cat if dragged */
+}
+
+#corner-cat img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+  /* subtle idle bob (disabled on reduce-motion) */
+}
+
+#corner-cat:hover img,
+#corner-cat.kb-hover img {   /* keyboard focus helper */
+  transform: rotate(-6deg) translateY(-2px);
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,.28));
+}
+
+/* a tiny idle bounce that pauses on hover */
+@media (prefers-reduced-motion: no-preference) {
+  #corner-cat img {
+    animation: catIdle 6s ease-in-out infinite;
+  }
+  #corner-cat:hover img,
+  #corner-cat.kb-hover img {
+    animation: none;
+  }
+}
+@keyframes catIdle {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-2px); }
+}
+
+
+/* 📁 Folder hover effect */
+.folder-wrapper {
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.folder-wrapper:active {
+  transform: scale(0.95);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.folder-wrapper:hover .folder {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.folder-wrapper:focus {
+  outline: none !important;
+}

@@ -10,9 +10,51 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainWindow = document.getElementById("window-home");
   refreshAmbientFX();
 
-
   let angelaClickCount = 0;
   let highestZIndex = 100;
+
+  function initCornerCat() {
+    const btn = document.createElement('button');
+    btn.id = 'corner-cat';
+    btn.setAttribute('aria-label', 'cute cat music');
+    btn.setAttribute('title', 'meow!');
+    btn.innerHTML = `
+      <img src="images/cute-cat.svg" alt="cute cat" />
+      <audio id="corner-cat-audio" src="sounds/cat-music.mp3" preload="auto"></audio>
+    `;
+    (document.getElementById('desktop') || document.body).appendChild(btn);
+
+    const audio = btn.querySelector('audio');
+    audio.volume = 0.5;
+
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    const play = () => {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    };
+    const stop = () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+
+    btn.addEventListener('mouseenter', () => { if (!isTouch) play(); });
+    btn.addEventListener('mouseleave', () => { if (!isTouch) stop(); });
+    btn.addEventListener('focus', () => btn.classList.add('kb-hover'));
+    btn.addEventListener('blur',  () => { btn.classList.remove('kb-hover'); stop(); });
+
+    let playing = false;
+    btn.addEventListener('click', () => {
+      if (!isTouch) return;
+      playing ? stop() : play();
+      playing = !playing;
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+    });
+  }
+  initCornerCat();
 
   // Create ambient layer if missing
   function ensureAmbientLayer() {
@@ -24,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return ambient;
   }
-
   function clearAmbient() {
     const ambient = ensureAmbientLayer();
     ambient.className = "";
@@ -40,9 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < count; i++) {
       const s = document.createElement('span');
       s.className = 'star';
-      const size = Math.random() * 2 + 1; // 1–3 px
-      const x = Math.random() * 100; // %
-      const y = Math.random() * 100; // %
+      const size = Math.random() * 2 + 1;
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
       const delay = (Math.random() * 4).toFixed(2) + 's';
       const dur = (3 + Math.random() * 3).toFixed(2) + 's';
 
@@ -66,8 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < count; i++) {
       const p = document.createElement('span');
       p.className = 'petal';
-      const left = Math.random() * 100; // %
-      const delay = (-Math.random() * 12).toFixed(2) + 's'; // negative for stagger
+      const left = Math.random() * 100;
+      const delay = (-Math.random() * 12).toFixed(2) + 's';
       const fall = (12 + Math.random() * 10).toFixed(2) + 's';
       const sway = (5 + Math.random() * 4).toFixed(2) + 's';
       const size = (14 + Math.random() * 12).toFixed(0) + 'px';
@@ -91,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   // Centered-but-staggered offsets
   const STAGGER = [
     [0, 0],
@@ -106,10 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   let nextOffsetIndex = 0;
 
-  // ⛑️ Only make the main window draggable if it exists at load
   if (mainWindow) makeDraggable(mainWindow);
 
-  // 💬 Angela's speech bubble
   function showAngelaBubble(text) {
     const bubble = document.getElementById("angela-bubble");
     if (!bubble) return;
@@ -118,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => bubble.classList.remove("show"), 2000);
   }
 
-  // 🌸 Intro transition (guarded)
   if (helloText) {
     helloText.addEventListener("click", () => {
       if (!helloScreen || !desktop) return;
@@ -130,22 +167,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔄 Swap link icons to match theme (used on toggle and can be reused anywhere)
   function refreshLinkIcons() {
     const isDark = document.body.classList.contains('night-mode');
     document.querySelectorAll('.link-icon img[data-name]').forEach(img => {
-      const name = img.dataset.name; // twitter/facebook/instagram/discord
+      const name = img.dataset.name;
       img.src = `images/${name}-${isDark ? 'dark' : 'light'}.svg`;
     });
   }
 
-  // 🌗 Toggle day/night mode (guarded)
   if (themeToggle) {
     themeToggle.addEventListener("change", () => {
       body.classList.toggle("night-mode");
       body.classList.toggle("day-mode");
       refreshAmbientFX();
-
 
       const isNight = body.classList.contains("night-mode");
 
@@ -157,7 +191,6 @@ document.addEventListener("DOMContentLoaded", () => {
         angelaIllustration.src = isNight ? "images/angela-dark.svg" : "images/angela-light.svg";
       }
 
-      // Update contact window illustration if open
       const contactIllu = document.querySelector("#window-contact .contact-illustration");
       if (contactIllu) {
         contactIllu.src = isNight ?
@@ -165,7 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
           "images/angela-light-heart.svg";
       }
 
-      // 🔁 Update link icons in the Links window (if it's open)
       refreshLinkIcons();
     });
   }
@@ -174,7 +206,8 @@ document.addEventListener("DOMContentLoaded", () => {
      🌸 FAQ HELPERS (behavior only)
      =============================== */
   function getFaqContent() {
-    const items = [{
+    const items = [
+      {
         q: "what software do you use?",
         a: `
           <ul>
@@ -185,22 +218,10 @@ document.addEventListener("DOMContentLoaded", () => {
           </ul>
         `
       },
-      {
-        q: "what are your rates?",
-        a: "i'm currently at 10-12$/hour!"
-      },
-      {
-        q: "what languages do you usually use?",
-        a: "html, css, js, and nodereact!"
-      },
-      {
-        q: "where do you get your sound effects?",
-        a: "free libraries, paid packs, and sometimes i record my own."
-      },
-      {
-        q: "do you draw?",
-        a: "yes! im actually saving up for an ipad to create more illustrations :3"
-      }
+      { q: "what are your rates?", a: "i'm currently at 10-12$/hour!" },
+      { q: "what languages do you usually use?", a: "html, css, js, and nodereact!" },
+      { q: "where do you get your sound effects?", a: "free libraries, paid packs, and sometimes i record my own." },
+      { q: "do you draw?", a: "yes! im actually saving up for an ipad to create more illustrations :3" }
     ];
 
     return `
@@ -227,7 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const panel = it.querySelector(".faq-a");
       btn.addEventListener("click", () => {
         const isOpen = it.classList.contains("open");
-        // close others
         root.querySelectorAll(".faq-item.open").forEach(o => {
           if (o !== it) {
             o.classList.remove("open");
@@ -235,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
             o.querySelector(".faq-q").setAttribute("aria-expanded", "false");
           }
         });
-        // toggle this
         it.classList.toggle("open");
         btn.setAttribute("aria-expanded", String(!isOpen));
         panel.style.maxHeight = isOpen ? null : panel.scrollHeight + "px";
@@ -243,26 +262,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔗 LINKS window content (now includes data-name for live swapping)
+  // 🔗 LINKS window content
   function getLinksContent() {
     const isDarkMode = document.body.classList.contains('night-mode');
 
-    const links = [{
-        href: "https://twitter.com/mryanglrts",
-        name: "twitter"
-      },
-      {
-        href: "https://facebook.com/assistwithmva",
-        name: "facebook"
-      },
-      {
-        href: "https://instagram.com/gelatisimeri",
-        name: "instagram"
-      },
-      {
-        href: "https://discord.com/users/848336476969369610",
-        name: "discord"
-      }
+    const links = [
+      { href: "https://twitter.com/mryanglrts", name: "twitter" },
+      { href: "https://facebook.com/assistwithmva", name: "facebook" },
+      { href: "https://instagram.com/gelatisimeri", name: "instagram" },
+      { href: "https://discord.com/users/848336476969369610", name: "discord" }
     ];
 
     return `
@@ -361,18 +369,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 📁 Folder data
-  const folderData = [{
-      id: "works",
-      label: "my works",
-      x: 100,
-      y: 150,
-      content: getWorksContent()
-    },
+  const folderData = [
+    { id: "works",   label: "my works",   x: 100,  y: 150, content: getWorksContent() },
     {
-      id: "contact",
-      label: "contact me",
-      x: 150,
-      y: 400,
+      id: "contact", label: "contact me", x: 150,  y: 400,
       content: `
         <div class="contact-window">
           <h2 class="contact-title">i'd love to talk!</h2>
@@ -395,76 +395,72 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `
     },
+    { id: "links",   label: "my links",   x: 420,  y: 160, content: getLinksContent() },
     {
-      id: "links",
-      label: "my links",
-      x: 420,
-      y: 160,
-      content: getLinksContent()
-    },
-    {
-      id: "about",
-      label: "about me",
-      x: 1600,
-      y: 420,
+      id: "about",   label: "about me",   x: 1600, y: 420,
       content: `
-    <div class="about-angela-wrapper">
-      <div class="about-header">
-        <img src="images/angela-dark-woah.svg" class="about-img" />
-        <div class="about-intro">
-          <h2 class="about-name">Mary Angela</h2>
-          <p class="about-title">Aspiring web designer & creative wannabe</p>
-          <p class="about-subtitle">i can be anything you want me to be tbh</p>
+        <div class="about-angela-wrapper">
+          <div class="about-header">
+            <img src="images/angela-dark-woah.svg" class="about-img" />
+            <div class="about-intro">
+              <h2 class="about-name">Mary Angela</h2>
+              <p class="about-title">Aspiring web designer & creative wannabe</p>
+              <p class="about-subtitle">i can be anything you want me to be tbh</p>
+            </div>
+          </div>
+          <hr />
+          <div class="about-description">
+            <p>hi! i’m angela, and i like to...</p>
+            <ul>
+              <li>design cute portfolios & websites & graphics</li>
+              <li>draw soft illustrations & write silly fanfics</li>
+              <li>create organized excel sheets for your data</li>
+              <li>edit reels & make my clients smile</li>
+            </ul>
+            <p>let’s work together! contact me at 
+            <a href="mailto:mryangelaworks@gmail.com">mryangelaworks@gmail.com</a>✨</p>
+          </div>
+          <hr />
+          <div class="about-edu">
+            <h3 class="edu-title">EDUCATION</h3>
+            <p class="edu-degree">Bachelor of Science in Information Technology</p>
+          </div>
+          <hr />
+          <div class="about-interests">
+            <h3 class="edu-title">OTHER INTERESTS</h3>
+            <ul style="list-style: disc; padding-left: 20px;">
+              <li>professional gaming</li>
+              <li>music! singing, guitar, piano, violin</li>
+              <li>league of legends</li>
+              <li>skyrim, elder scrolls</li>
+              <li>astrology and tarot cards!</li>
+              <li>color theory too~</li>
+            </ul>
+          </div>
+          <hr />
+          <div class="about-languages">
+            <h3 class="edu-title">LANGUAGE PROFICIENCY</h3>
+            <p>
+              i have fluency in 
+              <strong class="highlight-text">English</strong> and 
+              <strong class="highlight-text">Filipino (Bisaya)</strong>, 
+              and can speak in conversational 
+              <strong class="highlight-text">Japanese</strong>.
+            </p>
+            <p style="font-size: 0.9em; opacity: 0.8;">
+              "Salut, enchantée! Moi, c’est Mary!"
+              i speak a bit of French too, but not enough to hold a conversation. 
+            </p>
+          </div>
         </div>
-      </div>
-      <hr />
-      <div class="about-description">
-        <p>hi! i’m angela, and i like to...</p>
-        <ul>
-          <li>design cute portfolios & websites & graphics</li>
-          <li>draw soft illustrations & write silly fanfics</li>
-          <li>create organized excel sheets for your data</li>
-          <li>edit reels & make my clients smile</li>
-        </ul>
-        <p>let’s work together! contact me at 
-        <a href="mailto:mryangelaworks@gmail.com">mryangelaworks@gmail.com</a>✨</p>
-      </div>
-      <hr />
-      <div class="about-edu">
-        <h3 class="edu-title">EDUCATION</h3>
-        <p class="edu-degree">Bachelor of Science in Information Technology</p>
-      </div>
-      <hr />
-      <div class="about-interests">
-        <h3 class="edu-title">OTHER INTERESTS</h3>
-        <ul style="list-style: disc; padding-left: 20px;">
-          <li>professional gaming</li>
-          <li>music! singing, guitar, piano, violin</li>
-          <li>league of legends</li>
-          <li>skyrim, elder scrolls</li>
-          <li>astrology and tarot cards!</li>
-          <li>color theory too~</li>
-        </ul>
-      </div>
-      <hr />
-      <div class="about-languages">
-        <h3 class="edu-title">LANGUAGE PROFICIENCY</h3>
-        <p>
-          i have fluency in 
-          <strong class="highlight-text">English</strong> and 
-          <strong class="highlight-text">Filipino (Bisaya)</strong>, 
-          and can speak in conversational 
-          <strong class="highlight-text">Japanese</strong>.
-        </p>
-        <p style="font-size: 0.9em; opacity: 0.8;">
-          "Salut, enchantée! Moi, c’est Mary!"
-          i speak a bit of French too, but not enough to hold a conversation. 
-        </p>
-      </div>
-    </div>
-  `
+      `
     }
   ];
+
+  // 🔊 Folder click sound
+  const clickAudio = new Audio('sounds/folder-click.mp3');
+  clickAudio.preload = 'auto';
+  clickAudio.volume = 0.35;
 
   // 🗂️ Create folders on screen
   if (folderContainer) {
@@ -475,12 +471,20 @@ document.addEventListener("DOMContentLoaded", () => {
       folderWrapper.style.top = `${folder.y}px`;
       folderWrapper.style.left = `${folder.x}px`;
 
+      // [NEW] make focusable & button-like + store ids
+      folderWrapper.tabIndex = 0;
+      folderWrapper.setAttribute('role', 'button');
+      folderWrapper.setAttribute('aria-label', folder.label);
+      folderWrapper.dataset.fid = folder.id;
+      folderWrapper.dataset.label = folder.label;
+      folderWrapper.addEventListener('mousedown', () => folderWrapper.focus());
+
       const folderImg = document.createElement("img");
       folderImg.classList.add("folder");
       folderImg.src = body.classList.contains("night-mode") ?
         "images/folder-dark.svg" :
         "images/folder-light.svg";
-      folderImg.setAttribute("draggable", "false"); // prevent native img drag
+      folderImg.setAttribute("draggable", "false");
 
       const label = document.createElement("div");
       label.classList.add("folder-label");
@@ -490,7 +494,6 @@ document.addEventListener("DOMContentLoaded", () => {
       folderWrapper.appendChild(label);
       folderContainer.appendChild(folderWrapper);
 
-      // prevent native drag on wrapper
       folderWrapper.addEventListener("dragstart", (e) => e.preventDefault());
 
       makeDraggable(folderWrapper);
@@ -498,11 +501,41 @@ document.addEventListener("DOMContentLoaded", () => {
       folderWrapper.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (folderWrapper.__dragMoved) return; // don’t open if it was a drag
+        if (folderWrapper.__dragMoved) return;
+
+        clickAudio.currentTime = 0;
+        clickAudio.play().catch(()=>{});
+
         openWindow(folder.id, folder.label, folder.content);
       });
     });
   }
+
+  // [NEW] Delegated keyboard: prevent scroll on Space when a folder is focused
+  document.addEventListener('keydown', (e) => {
+    const isSpace = e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar' || e.code === 'Space';
+    const activeFolder = document.activeElement && document.activeElement.closest('.folder-wrapper');
+    if (activeFolder && isSpace) e.preventDefault();
+  });
+
+  // [NEW] Delegated keyboard: activate on Enter (keydown) and Space (keyup)
+  document.addEventListener('keyup', (e) => {
+    const isEnter = e.key === 'Enter';
+    const isSpace = e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar' || e.code === 'Space';
+    if (!isEnter && !isSpace) return;
+
+    const activeFolder = document.activeElement && document.activeElement.closest('.folder-wrapper');
+    if (!activeFolder) return;
+
+    e.preventDefault();
+
+    clickAudio.currentTime = 0;
+    clickAudio.play().catch(()=>{});
+
+    const fid = activeFolder.dataset.fid;
+    const f = folderData.find(x => x.id === fid);
+    if (f) openWindow(f.id, f.label, f.content);
+  });
 
   // 🧠 Angela illustration click logic (guarded)
   if (angelaIllustration) {
@@ -570,11 +603,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="window-content">${content}</div>
     `;
 
-    // add hidden first so we can measure actual size
     win.style.visibility = "hidden";
     windowContainer.appendChild(win);
 
-    // measure and compute centered + staggered position
     const rect = win.getBoundingClientRect();
     const w = rect.width || 560;
     const h = rect.height || 380;
@@ -589,44 +620,37 @@ document.addEventListener("DOMContentLoaded", () => {
     let left = baseX + dx;
     let top = baseY + dy;
 
-    // clamp to viewport
     left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
     top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
 
     win.style.left = `${left}px`;
     win.style.top = `${top}px`;
 
-    // reveal + animate
     win.style.visibility = "visible";
     requestAnimationFrame(() => {
       win.style.opacity = 1;
       win.style.transform = "scale(1)";
     });
 
-    // init FAQ accordion if this is the FAQ window
     if (id === "faq") {
       const root = win.querySelector(".window-content");
       initFaq(root);
     }
 
-    // if it's the Links window, make sure icons match current theme
     if (id === "links") {
       refreshLinkIcons();
     }
 
-    // bring to front & make draggable
     win.style.zIndex = ++highestZIndex;
     makeDraggable(win);
   }
 
-  // 🖱️ Dragging logic (thresholded: clicks ≠ drags)
+  // 🖱️ Dragging logic
   function makeDraggable(el) {
     let pressed = false;
     let dragging = false;
-    let startX = 0,
-      startY = 0;
-    let offsetX = 0,
-      offsetY = 0;
+    let startX = 0, startY = 0;
+    let offsetX = 0, offsetY = 0;
     const THRESHOLD = 8;
 
     el.addEventListener("mousedown", (e) => {
@@ -652,7 +676,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let newLeft = e.clientX - offsetX;
         let newTop = e.clientY - offsetY;
 
-        // Clamp so folder stays on screen
         newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - el.offsetWidth));
         newTop = Math.max(0, Math.min(newTop, window.innerHeight - el.offsetHeight));
 
@@ -666,9 +689,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pressed = false;
       el.style.transition = "all 0.4s ease";
       el.__dragMoved = dragging;
-      setTimeout(() => {
-        el.__dragMoved = false;
-      }, 0);
+      setTimeout(() => { el.__dragMoved = false; }, 0);
     });
   }
 
