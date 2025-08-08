@@ -50,6 +50,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 🔄 Swap link icons to match theme (used on toggle and can be reused anywhere)
+  function refreshLinkIcons() {
+    const isDark = document.body.classList.contains('night-mode');
+    document.querySelectorAll('.link-icon img[data-name]').forEach(img => {
+      const name = img.dataset.name; // twitter/facebook/instagram/discord
+      img.src = `images/${name}-${isDark ? 'dark' : 'light'}.svg`;
+    });
+  }
+
   // 🌗 Toggle day/night mode (guarded)
   if (themeToggle) {
     themeToggle.addEventListener("change", () => {
@@ -73,6 +82,9 @@ document.addEventListener("DOMContentLoaded", () => {
           ? "images/angela-dark-heart.svg"
           : "images/angela-light-heart.svg";
       }
+
+      // 🔁 Update link icons in the Links window (if it's open)
+      refreshLinkIcons();
     });
   }
 
@@ -138,91 +150,121 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 🔗 LINKS window content (now includes data-name for live swapping)
+  function getLinksContent() {
+    const isDarkMode = document.body.classList.contains('night-mode');
+
+    const links = [
+      { href: "https://twitter.com/mryanglrts",   name: "twitter"   },
+      { href: "https://facebook.com/assistwithmva",  name: "facebook"  },
+      { href: "https://instagram.com/gelatisimeri", name: "instagram" },
+      { href: "https://discord.com/users/848336476969369610",    name: "discord"   }
+    ];
+
+    return `
+      <div class="links-window">
+        <div class="link-grid">
+          ${links.map(l => `
+            <a class="link-card" href="${l.href}" target="_blank" rel="noopener">
+              <div class="link-icon">
+                <img
+                  src="images/${l.name}-${isDarkMode ? 'dark' : 'light'}.svg"
+                  alt="${l.name} icon"
+                  data-name="${l.name}"
+                  loading="lazy"
+                />
+              </div>
+              <div class="link-label">${l.name}</div>
+            </a>
+          `).join("")}
+        </div>
+        <p class="links-note">clicking any of the links will open a new tab!</p>
+      </div>
+    `;
+  }
+
   function getWorksContent() {
-  return `
-    <div class="works">
-      <!-- Banner -->
-      <div class="works-banner">
-        <strong>please do offer me a job</strong> via my <a href="mailto:mryangelaworks@gmail.com">work email</a>!
-        <div class="works-sub">i do web design, admin work, social media, and anything you want me to do... :)</div>
-      </div>
+    return `
+      <div class="works">
+        <!-- Banner -->
+        <div class="works-banner">
+          <strong>please do offer me a job</strong> via my <a href="mailto:mryangelaworks@gmail.com">work email</a>!
+          <div class="works-sub">i do web design, admin work, social media, and anything you want me to do... :)</div>
+        </div>
 
-      <!-- Chips: Tools / Dev -->
-      <div class="works-chips">
-        <section>
-          <h3>TOOLS I KNOW</h3>
-          <div class="chip-grid">
-            <span class="chip">Figma</span>
-            <span class="chip">Visual Studio Code</span>
-            <span class="chip">Canva</span>
-            <span class="chip">Google Workspace</span>
-            <span class="chip">Meta Ads</span>
-            <span class="chip">Excel Sheets</span>
-            <span class="chip">Thinking</span>
-            <span class="chip">Thinking</span>
+        <!-- Chips: Tools / Dev -->
+        <div class="works-chips">
+          <section>
+            <h3>TOOLS I KNOW</h3>
+            <div class="chip-grid">
+              <span class="chip">Figma</span>
+              <span class="chip">Visual Studio Code</span>
+              <span class="chip">Canva</span>
+              <span class="chip">Google Workspace</span>
+              <span class="chip">Meta Ads</span>
+              <span class="chip">Excel Sheets</span>
+              <span class="chip">Thinking</span>
+              <span class="chip">Thinking</span>
+            </div>
+          </section>
+
+          <section>
+            <h3>DEVELOPMENT</h3>
+            <div class="chip-grid">
+              <span class="chip">HTML/CSS</span>
+              <span class="chip">JavaScript</span>
+              <span class="chip">React</span>
+              <span class="chip">Next.js</span>
+              <span class="chip">Gatsby</span>
+              <span class="chip">C</span>
+              <span class="chip">Python</span>
+            </div>
+          </section>
+        </div>
+
+        <hr class="works-rule" />
+
+        <!-- Galleries -->
+        <section class="works-section">
+          <h3>GRAPHICS</h3>
+          <div class="card-grid">
+            <a class="card" href="#" target="_blank" rel="noopener">
+              <div class="thumb"></div>
+              <div class="card-title">Theater Design</div>
+            </a>
+            <a class="card" href="#" target="_blank" rel="noopener">
+              <div class="thumb"></div>
+              <div class="card-title">Automation Design</div>
+            </a>
           </div>
         </section>
 
-        <section>
-          <h3>DEVELOPMENT</h3>
-          <div class="chip-grid">
-            <span class="chip">HTML/CSS</span>
-            <span class="chip">JavaScript</span>
-            <span class="chip">React</span>
-            <span class="chip">Next.js</span>
-            <span class="chip">Gatsby</span>
-            <span class="chip">C</span>
-            <span class="chip">Python</span>
+        <section class="works-section">
+          <h3>WEB / UI</h3>
+          <div class="card-grid">
+            <a class="card" href="#" target="_blank" rel="noopener">
+              <div class="thumb"></div>
+              <div class="card-title">soft-portfolio concept</div>
+            </a>
+            <a class="card" href="#" target="_blank" rel="noopener">
+              <div class="thumb"></div>
+              <div class="card-title">haikyuu fan archive (ao3 helper)</div>
+            </a>
           </div>
         </section>
       </div>
-
-      <hr class="works-rule" />
-
-      <!-- Galleries (use whatever buckets you want) -->
-      <section class="works-section">
-        <h3>GRAPHICS</h3>
-        <div class="card-grid">
-          <a class="card" href="#" target="_blank" rel="noopener">
-            <div class="thumb"></div>
-            <div class="card-title">Theater Design</div>
-          </a>
-          <a class="card" href="#" target="_blank" rel="noopener">
-            <div class="thumb"></div>
-            <div class="card-title">Automation Design</div>
-          </a>
-        </div>
-      </section>
-
-      <section class="works-section">
-        <h3>WEB / UI</h3>
-        <div class="card-grid">
-          <a class="card" href="#" target="_blank" rel="noopener">
-            <div class="thumb"></div>
-            <div class="card-title">soft-portfolio concept</div>
-          </a>
-          <a class="card" href="#" target="_blank" rel="noopener">
-            <div class="thumb"></div>
-            <div class="card-title">haikyuu fan archive (ao3 helper)</div>
-          </a>
-        </div>
-      </section>
-    </div>
-  `;
-}
-
-
+    `;
+  }
 
   // 📁 Folder data
   const folderData = [
     {
-  id: "works",
-  label: "angela’s-works",
-  x: 100,
-  y: 150,
-  content: getWorksContent()
-},
-
+      id: "works",
+      label: "angela’s-works",
+      x: 100,
+      y: 150,
+      content: getWorksContent()
+    },
     {
       id: "contact",
       label: "contact-angela",
@@ -230,10 +272,10 @@ document.addEventListener("DOMContentLoaded", () => {
       y: 400,
       content: `
         <div class="contact-window">
-          <h2 class="contact-title">you wanna contact me?!</h2>
+          <h2 class="contact-title">i'd love to talk!</h2>
           <p class="contact-desc">
-            the easiest way to contact me is through email! i don’t really have any official social media,
-            so please direct questions to my email instead.
+            the easiest way to contact me is through email! i don’t really have any official social medias for work,
+            so please direct questions to my work email instead.
           </p>
           <img 
             src="${document.body.classList.contains('night-mode') 
@@ -251,47 +293,74 @@ document.addEventListener("DOMContentLoaded", () => {
       `
     },
     {
-      id: "faq",
-      label: "angela’s-faq",
-      x: window.innerWidth - 200,
-      y: 180,
-      content: getFaqContent() // <- accordion markup (theme is up to your CSS)
+      id: "links",
+      label: "angela-links",
+      x: 420,
+      y: 160,
+      content: getLinksContent()
     },
-    {
-      id: "about",
-      label: "about-angela",
-      x: 1600,
-      y: 420,
-      content: `
-        <div class="about-angela-wrapper">
-          <div class="about-header">
-            <img src="images/profile.png" class="about-img" />
-            <div class="about-intro">
-              <h2 class="about-name">Mary Angela</h2>
-              <p class="about-title">Aspiring web designer & creative pixel fairy</p>
-              <p class="about-subtitle">i can be anything you want me to be tbh</p>
-            </div>
-          </div>
-          <hr />
-          <div class="about-description">
-            <p>hi! i’m angela, and i like to...</p>
-            <ul>
-              <li>design cute portfolios & websites</li>
-              <li>draw soft illustrations & write silly fanfics</li>
-              <li>automate tasks with scripts & scraping</li>
-              <li>edit reels & make my clients smile</li>
-            </ul>
-            <p>let’s work together! contact me at 
-            <a href="mailto:mary@example.com">mryangelaworks@gmail.com</a> ✨</p>
-          </div>
-          <hr />
-          <div class="about-edu">
-            <h3 class="edu-title">EDUCATION</h3>
-            <p class="edu-degree">Bachelor of Science in Information Technology</p>
-          </div>
+   {
+  id: "about",
+  label: "about-angela",
+  x: 1600,
+  y: 420,
+  content: `
+    <div class="about-angela-wrapper">
+      <div class="about-header">
+        <img src="images/angela-dark-woah.svg" class="about-img" />
+        <div class="about-intro">
+          <h2 class="about-name">Mary Angela</h2>
+          <p class="about-title">Aspiring web designer & creative wannabe</p>
+          <p class="about-subtitle">i can be anything you want me to be tbh</p>
         </div>
-      `
-    }
+      </div>
+      <hr />
+      <div class="about-description">
+        <p>hi! i’m angela, and i like to...</p>
+        <ul>
+          <li>design cute portfolios & websites & graphics</li>
+          <li>draw soft illustrations & write silly fanfics</li>
+          <li>create organized excel sheets for your data</li>
+          <li>edit reels & make my clients smile</li>
+        </ul>
+        <p>let’s work together! contact me at 
+        <a href="mailto:mryangelaworks@gmail.com">mryangelaworks@gmail.com</a>✨</p>
+      </div>
+      <hr />
+      <div class="about-edu">
+        <h3 class="edu-title">EDUCATION</h3>
+        <p class="edu-degree">Bachelor of Science in Information Technology</p>
+      </div>
+      <hr />
+      <div class="about-interests">
+        <h3 class="edu-title">OTHER INTERESTS</h3>
+        <ul style="list-style: disc; padding-left: 20px;">
+          <li>professional gaming</li>
+          <li>music! singing, guitar, piano, violin</li>
+          <li>league of legends</li>
+          <li>skyrim, elder scrolls</li>
+          <li>astrology and tarot cards!</li>
+          <li>color theory too~</li>
+        </ul>
+      </div>
+      <hr />
+      <div class="about-languages">
+        <h3 class="edu-title">LANGUAGE PROFICIENCY</h3>
+        <p>
+          i have fluency in 
+          <strong class="highlight-text">English</strong> and 
+          <strong class="highlight-text">Filipino (Bisaya)</strong>, 
+          and can speak in conversational 
+          <strong class="highlight-text">Japanese</strong>.
+        </p>
+        <p style="font-size: 0.9em; opacity: 0.8;">
+          i speak a little bit of French: "Salut, enchantée! Moi, c’est Mary!"
+          still learning though, so please be patient with me!
+        </p>
+      </div>
+    </div>
+  `
+}
   ];
 
   // 🗂️ Create folders on screen
@@ -431,10 +500,15 @@ document.addEventListener("DOMContentLoaded", () => {
       win.style.transform = "scale(1)";
     });
 
-    // init FAQ accordion if this is the FAQ window (no styling here)
+    // init FAQ accordion if this is the FAQ window
     if (id === "faq") {
       const root = win.querySelector(".window-content");
       initFaq(root);
+    }
+
+    // if it's the Links window, make sure icons match current theme
+    if (id === "links") {
+      refreshLinkIcons();
     }
 
     // bring to front & make draggable
@@ -471,15 +545,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (dragging) {
         let newLeft = e.clientX - offsetX;
-let newTop = e.clientY - offsetY;
+        let newTop = e.clientY - offsetY;
 
-// Clamp so folder stays on screen
-newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - el.offsetWidth));
-newTop = Math.max(0, Math.min(newTop, window.innerHeight - el.offsetHeight));
+        // Clamp so folder stays on screen
+        newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - el.offsetWidth));
+        newTop = Math.max(0, Math.min(newTop, window.innerHeight - el.offsetHeight));
 
-el.style.left = `${newLeft}px`;
-el.style.top  = `${newTop}px`;
-
+        el.style.left = `${newLeft}px`;
+        el.style.top  = `${newTop}px`;
       }
     });
 
