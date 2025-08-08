@@ -266,19 +266,17 @@ input:checked+.slider:before {
    WINDOWS
 -------------------- */
 .window {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: fixed;           /* not absolute, not translated */
   width: 600px;
   background: #ffcdd2;
-  /* soft pink */
   border: 1px solid #333;
   border-radius: 4px;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
   overflow: hidden;
   animation: pop 0.3s ease;
 }
+
+
 
 @keyframes pop {
   0% {
