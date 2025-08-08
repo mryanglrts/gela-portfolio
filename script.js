@@ -8,9 +8,89 @@ document.addEventListener("DOMContentLoaded", () => {
   const folderContainer = document.getElementById("folders");
   const windowContainer = document.getElementById("windows");
   const mainWindow = document.getElementById("window-home");
+  refreshAmbientFX();
+
 
   let angelaClickCount = 0;
   let highestZIndex = 100;
+
+  // Create ambient layer if missing
+function ensureAmbientLayer() {
+  let ambient = document.getElementById('ambient');
+  if (!ambient) {
+    ambient = document.createElement('div');
+    ambient.id = 'ambient';
+    (document.getElementById('desktop') || document.body).appendChild(ambient);
+  }
+  return ambient;
+}
+
+function clearAmbient() {
+  const ambient = ensureAmbientLayer();
+  ambient.className = "";
+  ambient.innerHTML = "";
+}
+
+/* ===== Night: twinkling stars ===== */
+function createStars(count = 70) {
+  const ambient = ensureAmbientLayer();
+  clearAmbient();
+  ambient.classList.add('ambient-stars');
+
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    const size = Math.random() * 2 + 1;                // 1–3 px
+    const x = Math.random() * 100;                     // %
+    const y = Math.random() * 100;                     // %
+    const delay = (Math.random() * 4).toFixed(2) + 's';
+    const dur = (3 + Math.random() * 3).toFixed(2) + 's';
+
+    s.style.left = x + 'vw';
+    s.style.top = y + 'vh';
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.setProperty('--twinkle-delay', delay);
+    s.style.setProperty('--twinkle-dur', dur);
+
+    ambient.appendChild(s);
+  }
+}
+
+/* ===== Light: drifting flowers ===== */
+function createFlowers(count = 24) {
+  const ambient = ensureAmbientLayer();
+  clearAmbient();
+  ambient.classList.add('ambient-flowers');
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('span');
+    p.className = 'petal';
+    const left = Math.random() * 100;                  // %
+    const delay = (-Math.random() * 12).toFixed(2) + 's'; // negative for stagger
+    const fall = (12 + Math.random() * 10).toFixed(2) + 's';
+    const sway = (5 + Math.random() * 4).toFixed(2) + 's';
+    const size = (14 + Math.random() * 12).toFixed(0) + 'px';
+
+    p.style.setProperty('--x', left + 'vw');
+    p.style.setProperty('--delay', delay);
+    p.style.setProperty('--fall-dur', fall);
+    p.style.setProperty('--sway-dur', sway);
+    p.style.setProperty('--size', size);
+
+    ambient.appendChild(p);
+  }
+}
+
+/* Decide which effect based on current theme */
+function refreshAmbientFX() {
+  if (document.body.classList.contains('night-mode')) {
+    createStars();
+  } else {
+    createFlowers();
+  }
+}
+
 
   // Centered-but-staggered offsets
   const STAGGER = [
@@ -64,6 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
     themeToggle.addEventListener("change", () => {
       body.classList.toggle("night-mode");
       body.classList.toggle("day-mode");
+      refreshAmbientFX();
+
 
       const isNight = body.classList.contains("night-mode");
 
@@ -260,14 +342,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const folderData = [
     {
       id: "works",
-      label: "angela’s-works",
+      label: "my works",
       x: 100,
       y: 150,
       content: getWorksContent()
     },
     {
       id: "contact",
-      label: "contact-angela",
+      label: "contact me",
       x: 150,
       y: 400,
       content: `
@@ -294,14 +376,14 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "links",
-      label: "angela-links",
+      label: "my links",
       x: 420,
       y: 160,
       content: getLinksContent()
     },
    {
   id: "about",
-  label: "about-angela",
+  label: "about me",
   x: 1600,
   y: 420,
   content: `

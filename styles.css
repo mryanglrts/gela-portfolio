@@ -225,10 +225,10 @@ input:checked + .slider:before {
 
 .folder-label {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: 16px;
   color: #333;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1;
   font-family: 'DM Sans', sans-serif;
   pointer-events: none; /* optional: so label doesn’t interfere with click */
 }
@@ -484,6 +484,10 @@ body.night-mode .angela-bubble {
   text-decoration: underline;
 }
 
+body.night-mode .about-description a {
+  color: #f0e4ec;
+}
+
 .about-edu {
   margin-top: 1rem;
 }
@@ -515,6 +519,10 @@ body.night-mode .edu-title {
 .highlight-text {
   color: #2b2f20;
   font-weight: 600;
+}
+
+body.night-mode .highlight-text {
+  color: #f0e4ec; 
 }
 
 .about-languages p + p {
@@ -1017,3 +1025,60 @@ body.night-mode .edu-title {
 
 .day-mode .links-note { background: #ffffff; color: #2b2f20; opacity: .9; }
 .night-mode .links-note { background: #2b2f20; color: #ffeef3; opacity: .9; }
+
+
+/* Ambient FX layer (behind windows, above wallpaper) */
+#ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;           /* your windows go 100+, so this stays behind them */
+  overflow: hidden;
+}
+
+/* ========= Night mode: stars ========= */
+.ambient-stars .star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  opacity: 0.2;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.6));
+  animation: twinkle var(--twinkle-dur, 4s) ease-in-out var(--twinkle-delay, 0s) infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes twinkle {
+  0%   { opacity: 0.1; transform: scale(0.9); }
+  50%  { opacity: 1;   transform: scale(1); }
+  100% { opacity: 0.2; transform: scale(0.95); }
+}
+
+/* ========= Light mode: flowers (fixed) ========= */
+.ambient-flowers .petal {
+  position: absolute;
+  top: -10vh;
+  left: var(--x, 50%);
+  font-size: var(--size, 18px);
+  line-height: 1;
+  opacity: 0.9;
+  animation: petal-drift var(--fall-dur, 14s) linear var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+
+.ambient-flowers .petal::before {
+  content: "✿";
+  color: #f39bb2; /* tweak if you want more contrast on your pink */
+  text-shadow: 0 0 4px rgba(243,155,178,.35);
+}
+
+/* single animation: combines falling + swaying + rotation */
+@keyframes petal-drift {
+  0%   { transform: translate(-12px, -10vh) rotate(0deg);    opacity: 0; }
+  5%   { opacity: 0.95; }
+  25%  { transform: translate( 12px, 25vh)  rotate(120deg);  }
+  50%  { transform: translate(-12px, 55vh)  rotate(240deg);  }
+  75%  { transform: translate( 12px, 85vh)  rotate(320deg);  }
+  100% { transform: translate(-12px, 110vh) rotate(360deg);  opacity: 0.95; }
+}
