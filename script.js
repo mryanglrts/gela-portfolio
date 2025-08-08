@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const showCatBubble = (text) => {
     catBubble.querySelector('.cat-bubble-text').textContent = text;
     catBubble.classList.add('visible');
-    setTimeout(() => catBubble.classList.remove('visible'), 6000);
+    setTimeout(() => catBubble.classList.remove('visible'), 9000);
   };
 
   const CAT_LINES = [
