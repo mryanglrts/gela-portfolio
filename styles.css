@@ -1,0 +1,912 @@
+/* -------------------
+   BASIC RESET + FONTS
+-------------------- */
+@font-face {
+  font-family: 'Nekoya';
+  src: url('fonts/Nekoya.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: #fff;
+  color: #222;
+  transition: background 0.5s ease, color 0.5s ease;
+  overflow: hidden;
+}
+
+/* -------------------
+   DAY/NIGHT MODE
+-------------------- */
+body.night-mode {
+  background-color: #181818;
+  color: #f0e4ec;
+}
+
+body.night-mode .window {
+  background-color: #212121;
+  color: #f0e4ec;
+  border: 1px solid #2f3821;
+  box-shadow: 0 0 15px rgba(255, 205, 210, 0.1);
+}
+
+body.night-mode .window-header {
+  background-color: #ffcdd2;
+  color: #2f3821;
+  font-family: 'Nekoya', sans-serif;
+  text-shadow: none;
+}
+
+body.night-mode .window-content {
+  background-color: #2f3821;
+  color: #f0e4ec;
+}
+
+body.night-mode .folder-label {
+  color: #eee;
+}
+
+input:checked + .slider {
+  background-color: #ffcdd2;
+}
+
+input:checked + .slider:before {
+  background-color: #fff;
+}
+
+body.night-mode .close-btn {
+  color: #2f3821; /* dark green */
+}
+
+body.night-mode .close-btn:hover {
+  color: #ff8a9e; /* soft pink on hover, optional */
+}
+
+
+
+/* -------------------
+   HELLO SCREEN
+-------------------- */
+.hello-screen {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: #f8f7fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.hello-screen.hidden {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+#hello-text {
+  font-size: 5rem;
+  font-family: 'Nekoya', sans-serif;
+  color: #222;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+#hello-text:hover {
+  color: #ffb6c1;
+}
+
+#hello-text {
+  display: inline-block;
+  animation: wave 1.2s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(14deg); }
+  40% { transform: rotate(-8deg); }
+  60% { transform: rotate(14deg); }
+  80% { transform: rotate(-4deg); }
+}
+
+
+/* -------------------
+   TOGGLE SWITCH
+-------------------- */
+.toggle-wrapper {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+
+.slider {
+  position: absolute;
+  background-color: #ccc;
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.4s;
+  .slider {
+  pointer-events: none;
+}
+
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #ffb6c1;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* -------------------
+   DESKTOP
+-------------------- */
+.desktop {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+/* -------------------
+   FOLDERS
+-------------------- */
+
+.folder, .folder-wrapper, .window {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+
+.folder-wrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+  transition: all 0.4s ease;
+  pointer-events: auto;
+}
+
+.folder {
+  width: 100px;
+  height: auto;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  transition: filter 0.2s ease;
+}
+
+.folder-label {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #333;
+  text-align: center;
+  line-height: 1.2;
+  font-family: 'DM Sans', sans-serif;
+  pointer-events: none; /* optional: so label doesn’t interfere with click */
+}
+
+.folder:hover {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+}
+
+
+
+
+/* -------------------
+   WINDOWS
+-------------------- */
+.window {
+   position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  background: #ffcdd2; /* soft pink */
+  border: 1px solid #333;
+  border-radius: 4px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.window-content {
+  padding: 1rem;
+  background-color: #fff8f8;
+  border-radius: 0 0 10px 10px;
+  font-size: 0.95rem;
+  min-height: 100px;
+}
+
+
+
+.window-header {
+  background-color: #2f3821; /* dark green */
+  color: white;
+  font-family: 'Nekoya', sans-serif;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+
+.window-content.home-content {
+  background-color: #ffcdd2; /* light pink */
+  text-align: center;
+  padding: 3rem 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.window-content.home-content h1 {
+  font-family: 'Nekoya', sans-serif;
+  font-size: 3rem;
+  color: #2f3821;
+  margin: 0;
+  margin-bottom: 0.2rem; /* NEW! This gives it just a lil space from subtitle */
+}
+
+
+.window-content.home-content .subtitle {
+  font-size: 1.05rem;
+  color: #444;
+  margin-top: -1rem;
+  margin-bottom: -2rem;
+}
+
+.angela-inline {
+  width: 260px;
+  height: auto;
+  margin-bottom: -2rem; /* Add a soft space below the illustration */
+}
+
+body.night-mode .window-content.home-content {
+  background-color: #2f3821; /* deep green */
+  color: #f0e4ec;
+}
+
+body.night-mode .window-header {
+  background-color: #ffcdd2; /* soft pink */
+  color: #2f3821; /* dark green text */
+}
+
+body.night-mode .window-content.home-content h1 {
+  color: #f0e4ec; /* soft pink or any light color you like */
+}
+
+body.night-mode .window-content.home-content .subtitle {
+  color: #ddd;
+}
+
+
+
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.6s ease;
+}
+
+.desktop {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s ease;
+}
+
+#angela-illustration {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.angela-bubble {
+  position: absolute;
+  top: 53%;
+  left: 58%;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #333;
+  font-size: 0.85rem;
+  font-family: 'DM Sans', sans-serif;
+  padding: 6px 10px;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+
+.angela-bubble.show {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+
+.bubble-text {
+  z-index: 2;
+  position: relative;
+}
+
+.bubble-tail {
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 6px solid rgba(255, 255, 255, 0.95);
+  z-index: 1;
+}
+
+body.night-mode .bubble-tail {
+  border-right-color: rgba(32, 32, 32, 0.9);
+}
+
+body.night-mode .angela-bubble {
+  background-color: rgba(32, 32, 32, 0.9);
+  color: #eee;
+}
+
+
+
+.about-angela-wrapper {
+  padding: 1rem 0.75rem;
+  max-height: 350px;
+  overflow-y: auto;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.6;
+}
+
+.about-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+
+
+.about-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 100%;
+  object-fit: cover;
+  border: 3px solid var(--accent-color, pink);
+}
+
+.about-intro h2.about-name {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+.about-title {
+  font-size: 1rem;
+  color: var(--text-muted, #999);
+}
+
+.about-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted, #888);
+}
+
+.about-angela-wrapper hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid #ccc;
+  
+}
+
+.about-description p {
+  margin: 1rem 0;
+}
+
+
+.about-description ul {
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.about-description ul li {
+  margin-bottom: 0.3rem;
+}
+
+.about-description a {
+  color: var(--accent-color, pink);
+  text-decoration: underline;
+}
+
+.about-edu {
+  margin-top: 1rem;
+}
+
+.edu-title {
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  color: var(--text-main, #333);
+}
+
+body.night-mode .edu-title {
+  color: #f0e4ec; /* or any light/pastel color you love */
+}
+
+
+.edu-degree {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.edu-details {
+  font-size: 0.9rem;
+  color: var(--text-muted, #777);
+  font-style: italic;
+}
+
+/* CONTACT WINDOW PANEL */
+.contact-window {
+  text-align: center;
+  padding: 24px 20px; /* slightly less padding to tighten all content */
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Light mode = pink panel, olive-ish text */
+.day-mode .contact-window {
+  background: #f8c9d0;
+  color: #2b2f20;
+}
+
+/* Dark mode = deep green panel, soft pink accents */
+.night-mode .contact-window {
+  background: #223321;
+  color: #ffeef3;
+}
+
+.contact-title {
+  font-family: 'Nekoya', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: 0.5px;
+  margin: 4px 0 8px; /* tighter gap to desc */
+}
+
+.contact-desc {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  margin: 0 auto 0px; /* less gap below */
+  max-width: 54ch;
+  opacity: 0.95;
+}
+
+.contact-illustration {
+  width: 50%;
+  height: auto;
+  display: block;
+  margin: 2px auto 4px; /* tighter top/bottom spacing */
+  transform: none;
+}
+
+
+.contact-email {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.98rem;
+  margin: 2px 0 4px; /* close to illustration + note */
+}
+
+.contact-email a {
+  text-decoration: underline;
+}
+
+.contact-note {
+  font-size: 0.9rem;
+  margin: 0 0 6px; /* small gap before button */
+}
+
+/* Light mode accents */
+.day-mode .contact-email a {
+  color: #2b2f20;
+}
+
+.day-mode .contact-btn {
+  background: #2b2f20; /* dark green */
+  color: #ffffff;      /* white text */
+  border: 1px solid #2b2f20;
+}
+
+/* Dark mode accents */
+.night-mode .contact-email a {
+  color: #ffd6e3;
+}
+
+.night-mode .contact-btn {
+  background: #ffd6e3; /* pink */
+  color: #223321;      /* dark green text */
+  border: 1px solid #ffd6e3;
+}
+
+/* Button base */
+.contact-btn {
+  display: inline-block;
+  margin-top: 20px; /* minimal gap from text above */
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.2s;
+}
+
+.contact-btn:hover { transform: translateY(-1px); }
+.contact-btn:active {
+  transform: translateY(0);
+  opacity: 0.9;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ===== FAQ: structure & rhythm ===== */
+.faq {
+  display: grid;
+  gap: 12px;
+}
+
+.faq-item {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+/* Light / Dark card backgrounds */
+.day-mode .faq-item {
+  background: #fff4e0; /* warm cream (works with your light theme) */
+  border-color: rgba(0,0,0,0.08);
+}
+.night-mode .faq-item {
+  background: #2a3927; /* moss tint */
+  border-color: rgba(255,255,255,0.10);
+}
+
+/* ===== Question row ===== */
+.faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+/* Text colors */
+.day-mode .faq-q { color: #2b2f20; }
+.night-mode .faq-q { color: #ffeef3; }
+
+/* Hover/focus affordance */
+.faq-q:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.day-mode .faq-q:hover { background: rgba(0,0,0,0.04); }
+.night-mode .faq-q:hover { background: rgba(255,255,255,0.06); }
+
+/* ===== Chevron ===== */
+.faq-q .chev {
+  width: 10px; height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform .18s ease;
+  flex: 0 0 auto;
+}
+.faq-item.open .faq-q .chev {
+  transform: rotate(-135deg);
+}
+
+/* ===== Answer panel (smooth open/close) ===== */
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .22s ease;
+  will-change: max-height;
+  background: transparent;
+}
+.faq-a-inner {
+  padding: 12px 16px 16px;
+  font-size: .96rem;
+  line-height: 1.6;
+}
+.day-mode .faq-a-inner { color: #2b2f20; }
+.night-mode .faq-a-inner { color: #ffeef3; }
+
+/* Lists inside answers */
+.faq-a-inner ul { margin: 0; padding-left: 20px; }
+.faq-a-inner li { margin: 4px 0; }
+
+/* Links inside answers */
+.faq-a-inner a { text-decoration: underline; }
+.day-mode .faq-a-inner a { color: #8f3d00; }
+.night-mode .faq-a-inner a { color: #ffd6e3; }
+
+/* Slight lift on open */
+.faq-item.open {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.faq-item.open .faq-a-inner {
+  border-top: 1px dashed currentColor;
+  border-top-color: color-mix(in srgb, currentColor 30%, transparent);
+  margin-top: 2px;
+  padding-top: 12px;
+}
+
+
+
+/* Question row background + text */
+.day-mode .faq-q {
+  background-color: #2b2f20; /* dark green */
+  color: #ffeef3; /* light text */
+}
+
+.night-mode .faq-q {
+  background-color: #fbcdd5; /* light pink */
+  color: #2b2f20; /* dark green text */
+}
+
+/* Hover colors */
+.day-mode .faq-q:hover {
+  background-color: #38412b; /* slightly lighter green */
+}
+
+.night-mode .faq-q:hover {
+  background-color: #f9bfc9; /* slightly darker pink */
+}
+
+/* Answer background override */
+.day-mode .faq-a-inner {
+  background-color: #fbcdd5 !important;
+  color: #2b2f20; /* dark green text */
+}
+
+.night-mode .faq-a-inner {
+  background-color: #2b2f20 !important;
+  color: #ffeef3; /* light text */
+}
+
+
+/* container spacing */
+.works { padding: 8px 12px 18px; }
+
+/* banner */
+.works-banner {
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 8px 0 18px;
+  font-size: .96rem;
+}
+.works-banner .works-sub { opacity: .9; margin-top: 4px; }
+.works-banner a { text-decoration: underline; }
+
+/* light/dark theming */
+.day-mode .works-banner { background: #fff0b8; color: #2b2f20; }  /* a soft cream notice */
+.night-mode .works-banner { background: #394530; color: #ffeef3; }
+
+.day-mode .works h3 { color: #2b2f20; }
+.night-mode .works h3 { color: #ffeef3; }
+
+/* chips */
+.works-chips {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 720px) { .works-chips { grid-template-columns: 1fr; } }
+
+.chip-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.chip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px; /* perfect pill */
+  font-size: .88rem;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+  background: #fff; /* or your light-mode chip bg */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Title → chips spacing */
+.works-chips section h3 {
+  margin: 12px 0 8px;   /* top, sides, bottom */
+}
+
+/* Extra breathing room above the chip rows */
+.works-chips .chip-grid {
+  margin-top: 6px;
+}
+
+/* Column gap between Tools and Development (row x column) */
+.works-chips {
+  row-gap: 18px;
+  column-gap: 28px;
+}
+
+
+.day-mode .chip {
+  background: #fff;
+  border-color: rgba(0,0,0,.15);
+  color: #2b2f20;
+}
+
+.night-mode .chip {
+  background: #2b2f20;
+  border-color: rgba(255,255,255,.15);
+  color: #ffeef3;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+/* divider */
+.works-rule {
+  border: 0;
+  height: 1px;
+  margin: 18px 0;
+  background: currentColor;
+  opacity: .15;
+}
+
+/* Title → card grid spacing */
+.works-section h3 {
+  margin: 18px 0 10px;
+}
+
+/* Nudge the grid away from the title a bit more */
+.works-section .card-grid {
+  margin-top: 6px;      /* bump this up/down to taste */
+  gap: 16px;            /* space between cards */
+}
+
+/* If you’re using the divider line */
+.works-rule {
+  margin: 18px 0;       /* space above/below the <hr> */
+}
+
+
+/* sections + cards */
+.works-section { margin-top: 8px; }
+.card-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+@media (max-width: 900px) { .card-grid { grid-template-columns: 1fr; } }
+
+.card {
+  display: block;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid;
+  text-decoration: none;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.day-mode .card { background: #fff; border-color: rgba(0,0,0,.12); color: #2b2f20; }
+.night-mode .card { background: #223321; border-color: rgba(255,255,255,.12); color: #ffeef3; }
+
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+
+.thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0,0,0,.08), rgba(0,0,0,.08) 12px,
+    transparent 12px, transparent 24px
+  );
+}
+.night-mode .thumb {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,.08), rgba(255,255,255,.08) 12px,
+    transparent 12px, transparent 24px
+  );
+}
+.card-title { padding: 10px 12px; font-weight: 700; }
+
+/* window body background parity (optional)
+   if you want the works content panel to use your pink: */
+.day-mode .works { background: #fbcdd5; border-radius: 10px; }
+
+
+/* Banner color swap */
+.day-mode .works-banner {
+  background: #2b2f20; /* moss green */
+  color: #ffeef3; /* light pink text */
+}
+.day-mode .works-banner a {
+  color: #fbcdd5; /* soft pink for link */
+}
+
+.night-mode .works-banner {
+  background: #fbcdd5; /* your pink */
+  color: #2b2f20; /* moss text */
+}
+.night-mode .works-banner a {
+  color: #2b2f20; /* moss for link too */
+}

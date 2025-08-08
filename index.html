@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>angela's home</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+</head>
+<body class="day-mode">
+
+  <!-- HELLO SCREEN -->
+  <div id="hello-screen" class="hello-screen">
+    <h1 id="hello-text">hello!</h1>
+  </div>
+
+  <!-- DESKTOP -->
+  <div id="desktop" class="desktop hidden">
+    <div class="toggle-wrapper">
+      <label class="switch">
+        <input type="checkbox" id="theme-toggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+<div id="folders"></div> <!-- ✅ Now it’s OUTSIDE the toggle label! -->
+<div id="windows"></div> <!-- ✅ Add this too if you haven’t yet -->
+
+
+    <!-- my-home window -->
+<div id="window-home" class="window">
+  <div class="window-header">
+    <span>my-home</span>
+  </div>
+  <div class="window-content home-content">
+    <h1>hi! i'm angela</h1>
+    <p class="subtitle">an aspiring web designer, illustrator, and probably an artist?</p>
+    <img id="angela-illustration" src="images/angela-light.svg" class="angela-inline" alt="Angela Illustration">
+    <div id="angela-bubble" class="angela-bubble">
+  <div class="bubble-text"></div>
+  <div class="bubble-tail"></div>
+</div>
+
+  </div>
+</div>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
