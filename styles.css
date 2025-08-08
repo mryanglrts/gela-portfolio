@@ -932,6 +932,38 @@ body.night-mode .highlight-text {
   color: #2b2f20; /* moss for link too */
 }
 
+/* === Compact cards – overrides === */
+.works .card-grid {
+  gap: 10px;                                   /* tighter spacing */
+}
+
+/* smaller boxes */
+.works .card {
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+/* shorter thumbnail area */
+.works .thumb {
+  aspect-ratio: 21 / 10;                        /* was 16/9 → shorter height */
+  /* OR, if you prefer fixed height instead of aspect ratio: */
+  /* height: 120px; aspect-ratio: auto; */
+}
+
+/* smaller title pad */
+.works .card-title {
+  padding: 8px 10px;
+  font-weight: 700;
+  font-size: .95rem;
+}
+
+/* mobile: keep them readable */
+@media (max-width: 900px) {
+  .works .card-grid { gap: 12px; }
+  .works .thumb { height: 140px; aspect-ratio: auto; } /* slightly taller on small screens */
+}
+
+
 
 
 /* 🌸 MOBILE RESPONSIVE FIXES */
