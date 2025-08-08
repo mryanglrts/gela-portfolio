@@ -1,3 +1,18 @@
+// --- Firebase init (compat) ---
+const firebaseConfig = {
+  apiKey: "AIzaSyC2-8ZFH7gwHRRb4rT5hIBPK9PCtGIpiNc",
+  authDomain: "gela-portfolio.firebaseapp.com",
+  projectId: "gela-portfolio",
+  storageBucket: "gela-portfolio.appspot.com", // <-- FIXED
+  messagingSenderId: "132578520455",
+  appId: "1:132578520455:web:75ce7cd4b8087b6655b722",
+  measurementId: "G-YGF1F3P79M"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+// (no analytics needed)
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const helloScreen       = document.getElementById("hello-screen");
   const helloText         = document.getElementById("hello-text");
@@ -393,7 +408,47 @@ if (mainWindow) {
             </p>
           </div>
         </div>`
-    }
+    },
+    {
+  id: "resume",
+  label: "resume",
+  x: 1500,   // tweak position as you like
+  y: 220,
+  content: `
+    <div class="resume-window" style="text-align:center; padding:20px;">
+      <p style="margin-bottom:12px;">thanks for checking me out ♡</p>
+      <a href="my-resume.pdf" target="_blank" rel="noopener" class="resume-button">
+        open my resume here! :)
+      </a>
+      <p class="links-note" style="margin-top:12px;">it will open in a new tab.</p>
+    </div>
+  `
+}, 
+{
+  id: "guestbook",
+  label: "message board",
+  x: 1600,   // place it where you want
+  y: 80,
+  content: `
+    <div class="guestbook-root">
+      <h2 style="margin:0 0 8px;">leave me a message ♡</h2>
+      <form class="guestbook-form">
+        <div class="row">
+          <input name="name" type="text" placeholder="your name (optional)" maxlength="40"/>
+        </div>
+        <div class="row">
+          <textarea name="msg" placeholder="say something nice :)" maxlength="300" required></textarea>
+        </div>
+        <button type="submit" class="guestbook-btn">post</button>
+        <span class="guestbook-status" aria-live="polite"></span>
+      </form>
+      <hr/>
+      <div class="guestbook-list" aria-live="polite"></div>
+    </div>
+  `
+}
+
+
   ];
 
   /* ---------- Folder click sound ---------- */
@@ -501,6 +556,91 @@ if (mainWindow) {
     });
   }
 
+  function sanitize(str) {
+  // super basic guard; you can get fancier if you want
+  return String(str || "").trim();
+}
+
+function initGuestbook(rootEl) {
+  if (!rootEl) return;
+  const form   = rootEl.querySelector(".guestbook-form");
+  const listEl = rootEl.querySelector(".guestbook-list");
+  const status = rootEl.querySelector(".guestbook-status");
+
+  const escapeHTML = s => String(s||"").replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+  // live render from Firestore
+  db.collection("guestbook")
+    .orderBy("createdAt", "desc")
+    .limit(100)
+    .onSnapshot((snap) => {
+      listEl.innerHTML = "";
+      snap.forEach((doc) => {
+        const d = doc.data();
+        const name = d.name ? d.name : "anonymous friend";
+        const ts = d.createdAt?.toDate ? d.createdAt.toDate() : new Date();
+        const item = document.createElement("div");
+        item.className = "gb-item";
+        item.innerHTML = `
+          <div class="gb-meta">${escapeHTML(name)} • <span>${ts.toLocaleString()}</span></div>
+          <div class="gb-text">${escapeHTML(d.msg)}</div>
+        `;
+        listEl.appendChild(item);
+      });
+    });
+
+  // optimistic submit
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const name = String(fd.get("name") || "").trim().slice(0, 40);
+    const msg  = String(fd.get("msg")  || "").trim().slice(0, 300);
+    if (!msg) { status.textContent = "say something first!"; return; }
+
+    // rate limit: 30s
+    const last = Number(localStorage.getItem("gb_last") || 0);
+    const now  = Date.now();
+    if (now - last < 30_000) { status.textContent = "whoa tiger—wait a few seconds!"; return; }
+
+    // 1) show temp item immediately
+    const temp = document.createElement("div");
+    temp.className = "gb-item pending";
+    const when = new Date();
+    temp.innerHTML = `
+      <div class="gb-meta">${escapeHTML(name || "you")} • <span>${when.toLocaleString()}</span></div>
+      <div class="gb-text">${escapeHTML(msg)} <em class="pending-note">(sending…)</em></div>
+    `;
+    // put new messages on top
+    listEl.prepend(temp);
+
+    status.textContent = "posting…";
+    try {
+      await db.collection("guestbook").add({
+        name,
+        msg,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        ua: navigator.userAgent.slice(0,120)
+      });
+      localStorage.setItem("gb_last", String(now));
+      form.reset();
+      status.textContent = "posted! ♡";
+      // 2) remove the temp; real one will appear via onSnapshot
+      temp.remove();
+      setTimeout(() => (status.textContent = ""), 1200);
+    } catch (err) {
+      console.error(err);
+      // mark temp as failed
+      const note = temp.querySelector(".pending-note");
+      if (note) note.textContent = "(failed to send)";
+      temp.classList.add("failed");
+      status.textContent = "oops, failed to post.";
+    }
+  });
+}
+
+
+
+
   /* ---------- open window ---------- */
   function openWindow(id, title, content) {
     if (document.getElementById(`window-${id}`)) return;
@@ -548,6 +688,8 @@ if (mainWindow) {
 
     if (id === "faq") initFaq(win.querySelector(".window-content"));
     if (id === "links") refreshLinkIcons();
+    if (id === "guestbook") initGuestbook(win.querySelector(".guestbook-root"));
+
 
     win.style.zIndex = ++highestZIndex;
     makeDraggable(win);
