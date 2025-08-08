@@ -63,35 +63,68 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(() => centerWindowEl(mainWindow));
   }
 
-  /* ---------- corner cat ---------- */
   function initCornerCat() {
-    const btn = document.createElement('button');
-    btn.id = 'corner-cat';
-    btn.setAttribute('aria-label', 'cute cat music');
-    btn.setAttribute('title', 'meow!');
-    btn.innerHTML = `
-      <img src="images/cute-cat.svg" alt="cute cat" />
-      <audio id="corner-cat-audio" src="sounds/cat-music.mp3" preload="auto"></audio>
-    `;
-    (document.getElementById('desktop') || document.body).appendChild(btn);
+  const btn = document.createElement('button');
+  btn.id = 'corner-cat';
+  btn.setAttribute('aria-label', 'cute cat music');
+  btn.setAttribute('title', 'meow!');
+  btn.innerHTML = `
+    <img src="images/cute-cat.svg" alt="cute cat" />
+    <audio id="corner-cat-audio" src="sounds/cat-music.mp3" preload="auto"></audio>
+  `;
+  (document.getElementById('desktop') || document.body).appendChild(btn);
 
-    const audio = btn.querySelector('audio');
-    audio.volume = 0.5;
-    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const audio = btn.querySelector('audio');
+  audio.volume = 0.5;
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    const play = () => { audio.currentTime = 0; audio.play().catch(()=>{}); };
-    const stop = () => { audio.pause(); audio.currentTime = 0; };
+  const play = () => { audio.currentTime = 0; audio.play().catch(()=>{}); };
+  const stop = () => { audio.pause(); audio.currentTime = 0; };
 
-    btn.addEventListener('mouseenter', () => { if (!isTouch) play(); });
-    btn.addEventListener('mouseleave', () => { if (!isTouch) stop(); });
-    btn.addEventListener('focus', () => btn.classList.add('kb-hover'));
-    btn.addEventListener('blur',  () => { btn.classList.remove('kb-hover'); stop(); });
+  // bubble element (create ONCE)
+  const catBubble = document.createElement('div');
+  catBubble.id = 'cat-bubble';
+  catBubble.innerHTML = `<div class="cat-bubble-text"></div><div class="cat-bubble-tail"></div>`;
+  document.body.appendChild(catBubble);
+  const showCatBubble = (text) => {
+    catBubble.querySelector('.cat-bubble-text').textContent = text;
+    catBubble.classList.add('visible');
+    setTimeout(() => catBubble.classList.remove('visible'), 6000);
+  };
 
-    let playing = false;
-    btn.addEventListener('click', () => { if (isTouch) { playing ? stop() : play(); playing = !playing; }});
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
-  }
-  initCornerCat();
+  const CAT_LINES = [
+    "meow! you can drag the folders around if you want it arranged!",
+    "meow! did you know angela has a cat named yui?",
+    "angela is a libra! she's a softie.",
+    "what else do you need from me meow?",
+    "the secret of getting ahead, is getting started!",
+    "thanks for clicking me for the 6th time! meow",
+    "everything will work out in time~",
+    "buy me a coffee meow?",
+    "七転び八起き (nana korobi ya oki) — fall seven times, stand up eight!",
+    "thank you for everything!"
+  ];
+  let catClicks = 0;
+
+  // hover music on desktop
+  btn.addEventListener('mouseenter', () => { if (!isTouch) play(); });
+  btn.addEventListener('mouseleave', () => { if (!isTouch) stop(); });
+  btn.addEventListener('focus', () => btn.classList.add('kb-hover'));
+  btn.addEventListener('blur',  () => { btn.classList.remove('kb-hover'); stop(); });
+
+  // click: cycle line (loops after 10); toggle music on touch
+  btn.addEventListener('click', () => {
+    showCatBubble(CAT_LINES[catClicks % CAT_LINES.length]);
+    catClicks = (catClicks + 1) % CAT_LINES.length;
+    if (isTouch) { audio.paused ? play() : stop(); }
+  });
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+}
+
+initCornerCat();
+
+  
 
   /* ---------- ambient fx ---------- */
   function ensureAmbientLayer() {

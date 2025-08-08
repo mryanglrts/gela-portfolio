@@ -1485,3 +1485,47 @@ body.night-mode .highlight-text {
 .gb-item.pending { opacity: .7; filter: saturate(.9); }
 .gb-item.pending .pending-note { opacity: .7; font-style: italic; }
 .gb-item.failed { opacity: .9; }
+
+#cat-bubble {
+  position: fixed;
+  right: 130px; /* adjust so it sits above cat */
+  bottom: 100px;
+  max-width: 220px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2b2f20;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 9999;
+}
+
+.night-mode #cat-bubble {
+  background: rgba(34,51,33,0.85);
+  color: #ffeef3;
+}
+
+#cat-bubble.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cat-bubble-tail {
+  position: absolute;
+  bottom: -8px;
+  right: 16px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid rgba(255, 255, 255, 0.9);
+}
+
+.night-mode .cat-bubble-tail {
+  border-top-color: rgba(34,51,33,0.85);
+}
