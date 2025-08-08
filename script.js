@@ -230,9 +230,9 @@ document.addEventListener("DOMContentLoaded", () => {
       y: 400,
       content: `
         <div class="contact-window">
-          <h2 class="contact-title">yayy mail!</h2>
+          <h2 class="contact-title">you wanna contact me?!</h2>
           <p class="contact-desc">
-            the easiest way to contact me is through email! i don’t really check my social media messages,
+            the easiest way to contact me is through email! i don’t really have any official social media,
             so please direct questions to my email instead.
           </p>
           <img 
