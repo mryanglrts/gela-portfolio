@@ -354,8 +354,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <strong class="highlight-text">Japanese</strong>.
         </p>
         <p style="font-size: 0.9em; opacity: 0.8;">
-          i speak a little bit of French: "Salut, enchantée! Moi, c’est Mary!"
-          still learning though, so please be patient with me!
+          "Salut, enchantée! Moi, c’est Mary!"
+          i speak a bit of French too, but not enough to hold a conversation. 
         </p>
       </div>
     </div>
