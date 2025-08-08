@@ -470,8 +470,16 @@ document.addEventListener("DOMContentLoaded", () => {
         el.style.zIndex = ++highestZIndex;
       }
       if (dragging) {
-        el.style.left = `${e.clientX - offsetX}px`;
-        el.style.top  = `${e.clientY - offsetY}px`;
+        let newLeft = e.clientX - offsetX;
+let newTop = e.clientY - offsetY;
+
+// Clamp so folder stays on screen
+newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - el.offsetWidth));
+newTop = Math.max(0, Math.min(newTop, window.innerHeight - el.offsetHeight));
+
+el.style.left = `${newLeft}px`;
+el.style.top  = `${newTop}px`;
+
       }
     });
 
