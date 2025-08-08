@@ -12,6 +12,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 // (no analytics needed)
 
+// 🔊 theme toggle sound
+const toggleSound = new Audio('sounds/toggle-mode.mp3');
+toggleSound.preload = 'auto';
+toggleSound.volume = 0.45; // tweak to taste
 
 document.addEventListener("DOMContentLoaded", () => {
   const helloScreen       = document.getElementById("hello-screen");
@@ -190,26 +194,33 @@ if (mainWindow) {
   }
 
   /* ---------- theme toggle ---------- */
-  if (themeToggle) {
-    themeToggle.addEventListener("change", () => {
-      body.classList.toggle("night-mode");
-      body.classList.toggle("day-mode");
-      refreshAmbientFX();
+if (themeToggle) {
+  themeToggle.addEventListener("change", () => {
+    // play sound (safe-guarded)
+    try {
+      toggleSound.currentTime = 0;
+      toggleSound.play().catch(() => {});
+    } catch {}
 
-      const isNight = body.classList.contains("night-mode");
-      document.querySelectorAll(".folder").forEach(f => {
-        f.src = isNight ? "images/folder-dark.svg" : "images/folder-light.svg";
-      });
-      if (angelaIllustration) {
-        angelaIllustration.src = isNight ? "images/angela-dark.svg" : "images/angela-light.svg";
-      }
-      const contactIllu = document.querySelector("#window-contact .contact-illustration");
-      if (contactIllu) {
-        contactIllu.src = isNight ? "images/angela-dark-heart.svg" : "images/angela-light-heart.svg";
-      }
-      refreshLinkIcons();
+    body.classList.toggle("night-mode");
+    body.classList.toggle("day-mode");
+    refreshAmbientFX();
+
+    const isNight = body.classList.contains("night-mode");
+    document.querySelectorAll(".folder").forEach(f => {
+      f.src = isNight ? "images/folder-dark.svg" : "images/folder-light.svg";
     });
-  }
+    if (angelaIllustration) {
+      angelaIllustration.src = isNight ? "images/angela-dark.svg" : "images/angela-light.svg";
+    }
+    const contactIllu = document.querySelector("#window-contact .contact-illustration");
+    if (contactIllu) {
+      contactIllu.src = isNight ? "images/angela-dark-heart.svg" : "images/angela-light-heart.svg";
+    }
+    refreshLinkIcons();
+  });
+}
+
 
   /* ---------- FAQ helpers ---------- */
   function getFaqContent() {
@@ -219,10 +230,10 @@ if (mainWindow) {
               <li><strong>coding:</strong> Visual Studio Code! </li>
               <li><strong>design:</strong> Figma or Canva </li>
               <li><strong>courses:</strong> Youtube or Coursera? </li>
-              <li>you can send me an email you know...</li>
+              <li>you can pm me...owo</li>
             </ul>`},
       { q: "what are your rates?", a: "i'm currently at 10-12$/hour!" },
-      { q: "what languages do you usually use?", a: "html, css, js, and nodereact!" },
+      { q: "what languages do you usually use?", a: "html, css, and js! (for now)" },
       { q: "where do you get your sound effects?", a: "free libraries, paid packs, and sometimes i record my own." },
       { q: "do you draw?", a: "yes! im actually saving up for an ipad to create more illustrations :3" }
     ];
@@ -239,7 +250,9 @@ if (mainWindow) {
             </div>
           </div>`).join('')}
       </div>`;
-  }
+    
+    }
+  /* ---------- FAQ init ---------- */
   function initFaq(root) {
     const items = root.querySelectorAll(".faq-item");
     items.forEach((it) => {
@@ -424,6 +437,13 @@ if (mainWindow) {
     </div>
   `
 }, 
+{
+  id: "faq",
+  label: "faq",
+  x: 1300,  // place wherever you want
+  y: 560,
+  content: getFaqContent()
+},
 {
   id: "guestbook",
   label: "message board",
