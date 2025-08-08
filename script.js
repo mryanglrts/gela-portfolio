@@ -595,9 +595,16 @@ if (mainWindow) {
     });
   }
 
-  // expose close
-  window.closeWindow = function (id) {
-    const win = document.getElementById(`window-${id}`);
-    if (win) win.remove();
-  };
+  // 💫 Expose closeWindow globally for the ✖ button
+window.closeWindow = function (id) {
+  const win = document.getElementById(`window-${id}`);
+  if (win) {
+    // Play close sound
+    const closeAudio = new Audio('sounds/folder-close.mp3');
+    closeAudio.volume = 0.35;
+    closeAudio.play().catch(() => {});
+
+    win.remove();
+  }
+};
 });
