@@ -53,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
     el.style.top  = `${top}px`;
   }
 
+
+
   // PREVENT THE FLASH AT (0,0): hide + pre-center the main window immediately
   if (mainWindow) {
     mainWindow.style.position   = "fixed";
@@ -214,6 +216,7 @@ if (mainWindow) {
   makeDraggable(mainWindow);
   mainWindow.style.zIndex = ++highestZIndex;
 }
+initFooter();
     });
   }
 
@@ -347,7 +350,7 @@ if (themeToggle) {
               <span class="chip">Figma</span><span class="chip">Visual Studio Code</span>
               <span class="chip">Canva</span><span class="chip">Google Workspace</span>
               <span class="chip">Meta Ads</span><span class="chip">Excel Sheets</span>
-              <span class="chip">Thinking</span><span class="chip">Thinking</span>
+              <span class="chip">Photoshop</span><span class="chip">Illustrator</span>
             </div>
           </section>
           <section>
@@ -355,7 +358,7 @@ if (themeToggle) {
             <div class="chip-grid">
               <span class="chip">HTML/CSS</span><span class="chip">JavaScript</span>
               <span class="chip">React</span><span class="chip">Next.js</span>
-              <span class="chip">Gatsby</span><span class="chip">C</span><span class="chip">Python</span>
+              <span class="chip">C#</span><span class="chip">C</span><span class="chip">Python</span>
             </div>
           </section>
         </div>
@@ -364,14 +367,14 @@ if (themeToggle) {
           <h3>GRAPHICS</h3>
           <div class="card-grid">
             <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">Theater Design</div></a>
-            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">Automation Design</div></a>
+            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">POS Design</div></a>
           </div>
         </section>
         <section class="works-section">
           <h3>WEB / UI</h3>
           <div class="card-grid">
             <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">soft-portfolio concept</div></a>
-            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">haikyuu fan archive (ao3 helper)</div></a>
+            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">friendster-reborn</div></a>
           </div>
         </section>
       </div>`;
@@ -473,7 +476,7 @@ if (themeToggle) {
 {
   id: "faq",
   label: "faq",
-  x: 1300,  // place wherever you want
+  x: 1500,  // place wherever you want
   y: 560,
   content: getFaqContent()
 },

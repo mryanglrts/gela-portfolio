@@ -1529,3 +1529,18 @@ body.night-mode .highlight-text {
 .night-mode .cat-bubble-tail {
   border-top-color: rgba(34,51,33,0.85);
 }
+
+.site-footer {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.day-mode .site-footer { color: #2b2f20; }
+.night-mode .site-footer { color: #ffeef3; }
