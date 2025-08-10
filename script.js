@@ -119,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showCatBubble(CAT_LINES[catClicks % CAT_LINES.length]);
     catClicks = (catClicks + 1) % CAT_LINES.length;
     if (isTouch) { audio.paused ? play() : stop(); }
+    btn.blur();
   });
 
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
