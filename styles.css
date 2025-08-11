@@ -298,6 +298,64 @@ input:checked+.slider:before {
   cursor: pointer;
 }
 
+#window-works .window-content {
+  max-height: 75vh; /* prevents going past screen */
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(0,0,0,0.25) transparent;
+}
+
+/* Chrome/Edge/WebKit scrollbar */
+#window-works .window-content::-webkit-scrollbar {
+  width: 8px;
+}
+#window-works .window-content::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.25);
+  border-radius: 4px;
+}
+#window-works .window-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.4);
+}
+
+/* Scrollable Works Window */
+#window-works .window-content {
+  max-height: 75vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* --- Day mode scroll --- */
+.day-mode #window-works .window-content {
+  scrollbar-color: #2b2f20 transparent; /* dark green thumb, transparent track */
+}
+.day-mode #window-works .window-content::-webkit-scrollbar {
+  width: 8px;
+}
+.day-mode #window-works .window-content::-webkit-scrollbar-thumb {
+  background: #2b2f20;
+  border-radius: 4px;
+}
+.day-mode #window-works .window-content::-webkit-scrollbar-thumb:hover {
+  background: #1f261a;
+}
+
+/* --- Night mode scroll --- */
+.night-mode #window-works .window-content {
+  scrollbar-color: #ffeef3 transparent; /* light pink thumb, transparent track */
+}
+.night-mode #window-works .window-content::-webkit-scrollbar {
+  width: 8px;
+}
+.night-mode #window-works .window-content::-webkit-scrollbar-thumb {
+  background: #ffeef3;
+  border-radius: 4px;
+}
+.night-mode #window-works .window-content::-webkit-scrollbar-thumb:hover {
+  background: #e3d3d8;
+}
+
+
+
 .window-content {
   padding: 1rem;
   background-color: #fff8f8;
