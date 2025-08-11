@@ -488,13 +488,13 @@ if (themeToggle) {
   y: 80,
   content: `
     <div class="guestbook-root">
-      <h2 style="margin:0 0 8px;">my friends say..♡</h2>
+      <h2 style="margin:0 0 8px;">people say...♡</h2>
       <form class="guestbook-form">
         <div class="row">
           <input name="name" type="text" placeholder="your name (optional)" maxlength="40"/>
         </div>
         <div class="row">
-          <textarea name="msg" placeholder="say something nice (pls) :)" maxlength="300" required></textarea>
+          <textarea name="msg" placeholder="say something nice (pls) :)" maxlength="1000" required></textarea>
         </div>
         <button type="submit" class="guestbook-btn">post</button>
         <span class="guestbook-status" aria-live="polite"></span>
