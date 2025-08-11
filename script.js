@@ -1,141 +1,95 @@
+// ==============================
+// Angela / Gela Portfolio Script
+// (bgm plays ONCE only when toggling theme; no ding; no autoplay)
+// ==============================
+
 // --- Firebase init (compat) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyC2-8ZFH7gwHRRb4rT5hIBPK9PCtGIpiNc",
+  apiKey: "AIzaSyC2-8ZFH7gwHRRb4rT5hIBPK9PC9PCtGIpiNc", // keeping as provided
   authDomain: "gela-portfolio.firebaseapp.com",
   projectId: "gela-portfolio",
-  storageBucket: "gela-portfolio.appspot.com", // <-- FIXED
+  storageBucket: "gela-portfolio.appspot.com",
   messagingSenderId: "132578520455",
   appId: "1:132578520455:web:75ce7cd4b8087b6655b722",
   measurementId: "G-YGF1F3P79M"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-// (no analytics needed)
+const db = firebase.firestore(); // no analytics needed
 
-// 🔊 theme toggle sound
-const toggleSound = new Audio('sounds/toggle-mode.mp3');
-toggleSound.preload = 'auto';
-toggleSound.volume = 0.45; // tweak to taste
+// ---------------------------
+// Audio: ONLY what you need
+// ---------------------------
 
-document.addEventListener("DOMContentLoaded", () => {
-  const helloScreen       = document.getElementById("hello-screen");
-  const helloText         = document.getElementById("hello-text");
-  const desktop           = document.getElementById("desktop");
-  const angelaIllustration= document.getElementById("angela-illustration");
-  const themeToggle       = document.getElementById("theme-toggle");
-  const body              = document.body;
-  const folderContainer   = document.getElementById("folders");
-  const windowContainer   = document.getElementById("windows");
-  const mainWindow        = document.getElementById("window-home");
+// SFX: folder open (kept)
+const clickAudio = new Audio("sounds/folder-click.mp3");
+clickAudio.preload = "auto";
+clickAudio.volume = 0.35;
 
-  refreshAmbientFX();
+// THEME "BGM" (but as a one-shot cue on toggle)
+const themeBGM = new Audio();
+themeBGM.preload = "auto";
+themeBGM.loop = false;            // <<< IMPORTANT: no loop
+themeBGM.volume = 0.25;
+let isBgmPlaying = false;         // track one-shot state
 
-  let angelaClickCount = 0;
-  let highestZIndex    = 100;
-
-  /* ---------- helpers ---------- */
-  function centerWindowEl(el, margin = 16) {
-    if (!el) return;
-    el.style.position  = "fixed";     // viewport coords
-    el.style.transform = "none";      // kill 50/50 translate if any
-
-    // measure (must be in DOM to get size)
-    const w = el.offsetWidth  || 600;
-    const h = el.offsetHeight || 380;
-
-    // center + clamp a bit
-    let left = (window.innerWidth  - w) / 2;
-    let top  = (window.innerHeight - h) / 2;
-    left = Math.max(margin, Math.min(left, window.innerWidth  - w - margin));
-    top  = Math.max(margin, Math.min(top,  window.innerHeight - h - margin));
-
-    el.style.left = `${left}px`;
-    el.style.top  = `${top}px`;
-  }
-
-
-
-  // PREVENT THE FLASH AT (0,0): hide + pre-center the main window immediately
-  if (mainWindow) {
-    mainWindow.style.position   = "fixed";
-    mainWindow.style.visibility = "hidden";
-    mainWindow.style.opacity    = "0";
-    mainWindow.style.transform  = "none";
-    // wait a frame so layout exists, then center
-    requestAnimationFrame(() => centerWindowEl(mainWindow));
-  }
-
-  function initCornerCat() {
-  const btn = document.createElement('button');
-  btn.id = 'corner-cat';
-  btn.setAttribute('aria-label', 'cute cat music');
-  btn.setAttribute('title', 'meow!');
-  btn.innerHTML = `
-    <img src="images/cute-cat.svg" alt="cute cat" />
-    <audio id="corner-cat-audio" src="sounds/cat-music.mp3" preload="auto"></audio>
-  `;
-  (document.getElementById('desktop') || document.body).appendChild(btn);
-
-  const audio = btn.querySelector('audio');
-  audio.volume = 0.5;
-  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-  const play = () => { audio.currentTime = 0; audio.play().catch(()=>{}); };
-  const stop = () => { audio.pause(); audio.currentTime = 0; };
-
-  // bubble element (create ONCE)
-  const catBubble = document.createElement('div');
-  catBubble.id = 'cat-bubble';
-  catBubble.innerHTML = `<div class="cat-bubble-text"></div><div class="cat-bubble-tail"></div>`;
-  document.body.appendChild(catBubble);
-  const showCatBubble = (text) => {
-    catBubble.querySelector('.cat-bubble-text').textContent = text;
-    catBubble.classList.add('visible');
-    setTimeout(() => catBubble.classList.remove('visible'), 9000);
-  };
-
-  const CAT_LINES = [
-    "meow! you can drag the folders around if you want it arranged!",
-    "meow! did you know angela has a cat named yui?",
-    "angela is a libra! she's a softie.",
-    "what else do you need from me meow?",
-    "the secret of getting ahead, is getting started!",
-    "thanks for clicking me for the 6th time! meow",
-    "everything will work out in time~",
-    "buy me a coffee meow?",
-    "七転び八起き (nana korobi ya oki) — fall seven times, stand up eight!",
-    "thank you for everything!"
-  ];
-  let catClicks = 0;
-
-  // hover music on desktop
-  btn.addEventListener('mouseenter', () => { if (!isTouch) play(); });
-  btn.addEventListener('mouseleave', () => { if (!isTouch) stop(); });
-  btn.addEventListener('focus', () => btn.classList.add('kb-hover'));
-  btn.addEventListener('blur',  () => { btn.classList.remove('kb-hover'); stop(); });
-
-  // click: cycle line (loops after 10); toggle music on touch
-  btn.addEventListener('click', () => {
-    showCatBubble(CAT_LINES[catClicks % CAT_LINES.length]);
-    catClicks = (catClicks + 1) % CAT_LINES.length;
-    if (isTouch) { audio.paused ? play() : stop(); }
-    btn.blur();
-  });
-
-  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+function pickBgmTrack() {
+  // choose which cue to play depending on current theme AFTER toggle
+  return document.body.classList.contains("night-mode")
+    ? "sounds/night-bgm.mp3"
+    : "sounds/day-bgm.mp3";
 }
 
-initCornerCat();
+// play once, then stop — no resume, no visibility tricks
+async function playThemeCueOnce() {
+  // stop any currently playing cue
+  try { themeBGM.pause(); } catch {}
+  themeBGM.currentTime = 0;
 
-  
+  // set the proper source for the *current* theme
+  themeBGM.src = pickBgmTrack();
 
-  /* ---------- ambient fx ---------- */
+  // safety: when it ends, clear the flag
+  themeBGM.onended = () => { isBgmPlaying = false; };
+
+  try {
+    await themeBGM.play(); // allowed because user just clicked the toggle
+    isBgmPlaying = true;
+
+    // double-safety: hard stop after 6s in case file is long
+    setTimeout(() => {
+      if (!themeBGM.paused) {
+        try { themeBGM.pause(); } catch {}
+        isBgmPlaying = false;
+      }
+    }, 6000);
+  } catch {
+    // ignore autoplay errors silently
+  }
+}
+
+// NO visibilitychange handler for themeBGM (we don't want it to revive)
+
+// ---------------------------
+// DOM Ready
+// ---------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const helloScreen        = document.getElementById("hello-screen");
+  const helloText          = document.getElementById("hello-text");
+  const desktop            = document.getElementById("desktop");
+  const angelaIllustration = document.getElementById("angela-illustration");
+  const themeToggle        = document.getElementById("theme-toggle");
+  const body               = document.body;
+  const folderContainer    = document.getElementById("folders");
+  const windowContainer    = document.getElementById("windows");
+  const mainWindow         = document.getElementById("window-home");
+
+  // ---------- Ambient FX ----------
   function ensureAmbientLayer() {
-    let ambient = document.getElementById('ambient');
+    let ambient = document.getElementById("ambient");
     if (!ambient) {
-      ambient = document.createElement('div');
-      ambient.id = 'ambient';
-      (document.getElementById('desktop') || document.body).appendChild(ambient);
+      ambient = document.createElement("div");
+      ambient.id = "ambient";
+      (desktop || document.body).appendChild(ambient);
     }
     return ambient;
   }
@@ -147,50 +101,141 @@ initCornerCat();
   function createStars(count = 70) {
     const ambient = ensureAmbientLayer();
     clearAmbient();
-    ambient.classList.add('ambient-stars');
+    ambient.classList.add("ambient-stars");
     for (let i = 0; i < count; i++) {
-      const s = document.createElement('span');
-      s.className = 'star';
+      const s = document.createElement("span");
+      s.className = "star";
       const size = Math.random() * 2 + 1;
       const x = Math.random() * 100;
       const y = Math.random() * 100;
-      const delay = (Math.random() * 4).toFixed(2) + 's';
-      const dur = (3 + Math.random() * 3).toFixed(2) + 's';
-      s.style.left = x + 'vw';
-      s.style.top = y + 'vh';
-      s.style.width = size + 'px';
-      s.style.height = size + 'px';
-      s.style.setProperty('--twinkle-delay', delay);
-      s.style.setProperty('--twinkle-dur', dur);
+      const delay = (Math.random() * 4).toFixed(2) + "s";
+      const dur = (3 + Math.random() * 3).toFixed(2) + "s";
+      s.style.left = x + "vw";
+      s.style.top = y + "vh";
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+      s.style.setProperty("--twinkle-delay", delay);
+      s.style.setProperty("--twinkle-dur", dur);
       ambient.appendChild(s);
     }
   }
   function createFlowers(count = 24) {
     const ambient = ensureAmbientLayer();
     clearAmbient();
-    ambient.classList.add('ambient-flowers');
+    ambient.classList.add("ambient-flowers");
     for (let i = 0; i < count; i++) {
-      const p = document.createElement('span');
-      p.className = 'petal';
+      const p = document.createElement("span");
+      p.className = "petal";
       const left = Math.random() * 100;
-      const delay = (-Math.random() * 12).toFixed(2) + 's';
-      const fall  = (12 + Math.random() * 10).toFixed(2) + 's';
-      const sway  = (5 + Math.random() * 4).toFixed(2) + 's';
-      const size  = (14 + Math.random() * 12).toFixed(0) + 'px';
-      p.style.setProperty('--x', left + 'vw');
-      p.style.setProperty('--delay', delay);
-      p.style.setProperty('--fall-dur', fall);
-      p.style.setProperty('--sway-dur', sway);
-      p.style.setProperty('--size', size);
+      const delay = (-Math.random() * 12).toFixed(2) + "s";
+      const fall  = (12 + Math.random() * 10).toFixed(2) + "s";
+      const sway  = (5 + Math.random() * 4).toFixed(2) + "s";
+      const size  = (14 + Math.random() * 12).toFixed(0) + "px";
+      p.style.setProperty("--x", left + "vw");
+      p.style.setProperty("--delay", delay);
+      p.style.setProperty("--fall-dur", fall);
+      p.style.setProperty("--sway-dur", sway);
+      p.style.setProperty("--size", size);
       ambient.appendChild(p);
     }
   }
   function refreshAmbientFX() {
-    if (document.body.classList.contains('night-mode')) createStars();
+    if (document.body.classList.contains("night-mode")) createStars();
     else createFlowers();
   }
+  refreshAmbientFX();
 
-  /* ---------- misc ---------- */
+  // ---------- Layout helpers ----------
+  let angelaClickCount = 0;
+  let highestZIndex    = 100;
+
+  function centerWindowEl(el, margin = 16) {
+    if (!el) return;
+    el.style.position  = "fixed";
+    el.style.transform = "none";
+
+    const w = el.offsetWidth  || 600;
+    const h = el.offsetHeight || 380;
+
+    let left = (window.innerWidth  - w) / 2;
+    let top  = (window.innerHeight - h) / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth  - w - margin));
+    top  = Math.max(margin, Math.min(top,  window.innerHeight - h - margin));
+
+    el.style.left = `${left}px`;
+    el.style.top  = `${top}px`;
+  }
+
+  // kill the (0,0) flash on main window
+  if (mainWindow) {
+    mainWindow.style.position   = "fixed";
+    mainWindow.style.visibility = "hidden";
+    mainWindow.style.opacity    = "0";
+    mainWindow.style.transform  = "none";
+    requestAnimationFrame(() => centerWindowEl(mainWindow));
+  }
+
+  // ---------- Corner Cat ----------
+  function initCornerCat() {
+    const btn = document.createElement("button");
+    btn.id = "corner-cat";
+    btn.setAttribute("aria-label", "cute cat music");
+    btn.setAttribute("title", "meow!");
+    btn.innerHTML = `
+      <img src="images/cute-cat.svg" alt="cute cat" />
+      <audio id="corner-cat-audio" src="sounds/cat-music.mp3" preload="auto"></audio>
+    `;
+    (desktop || document.body).appendChild(btn);
+
+    const audio = btn.querySelector("audio");
+    audio.volume = 0.5;
+    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+    const play = () => { audio.currentTime = 0; audio.play().catch(()=>{}); };
+    const stop = () => { audio.pause(); audio.currentTime = 0; };
+
+    const catBubble = document.createElement("div");
+    catBubble.id = "cat-bubble";
+    catBubble.innerHTML = `<div class="cat-bubble-text"></div><div class="cat-bubble-tail"></div>`;
+    document.body.appendChild(catBubble);
+
+    const showCatBubble = (text) => {
+      catBubble.querySelector(".cat-bubble-text").textContent = text;
+      catBubble.classList.add("visible");
+      setTimeout(() => catBubble.classList.remove("visible"), 9000);
+    };
+
+    const CAT_LINES = [
+      "meow! you can drag the folders around if you want it arranged!",
+      "meow! did you know angela has a cat named yui?",
+      "angela is a libra! she's a softie.",
+      "what else do you need from me meow?",
+      "the secret of getting ahead, is getting started!",
+      "thanks for clicking me for the 6th time! meow",
+      "everything will work out in time~",
+      "buy me a coffee meow?",
+      "七転び八起き — fall seven times, stand up eight!",
+      "thank you for everything!"
+    ];
+    let catClicks = 0;
+
+    btn.addEventListener("mouseenter", () => { if (!isTouch) play(); });
+    btn.addEventListener("mouseleave", () => { if (!isTouch) stop(); });
+    btn.addEventListener("focus", () => btn.classList.add("kb-hover"));
+    btn.addEventListener("blur",  () => { btn.classList.remove("kb-hover"); stop(); });
+
+    btn.addEventListener("click", () => {
+      showCatBubble(CAT_LINES[catClicks % CAT_LINES.length]);
+      catClicks = (catClicks + 1) % CAT_LINES.length;
+      if (isTouch) { audio.paused ? play() : stop(); }
+      btn.blur();
+    });
+
+    document.addEventListener("visibilitychange", () => { if (document.hidden) stop(); });
+  }
+  initCornerCat();
+
+  // ---------- Misc (bubbles, stagger) ----------
   const STAGGER = [[0,0],[24,24],[-24,24],[24,-24],[-24,-24],[48,48],[-48,48],[48,-48],[-48,-48]];
   let nextOffsetIndex = 0;
 
@@ -202,72 +247,71 @@ initCornerCat();
     setTimeout(() => bubble.classList.remove("show"), 2000);
   }
 
-  /* ---------- hello → reveal desktop & main window (already centered) ---------- */
+  // ---------- Hello → Desktop ----------
   if (helloText) {
     helloText.addEventListener("click", () => {
       if (!helloScreen || !desktop) return;
       helloScreen.style.display = "none";
-desktop.classList.remove("hidden");
+      desktop.classList.remove("hidden");
 
-if (mainWindow) {
-  centerWindowEl(mainWindow);
-  // show immediately (no fade)
-  mainWindow.style.visibility = "visible";
-  mainWindow.style.opacity = "1";
-  makeDraggable(mainWindow);
-  mainWindow.style.zIndex = ++highestZIndex;
-}
-initFooter();
+      if (mainWindow) {
+        centerWindowEl(mainWindow);
+        mainWindow.style.visibility = "visible";
+        mainWindow.style.opacity = "1";
+        makeDraggable(mainWindow);
+        mainWindow.style.zIndex = ++highestZIndex;
+      }
+      window.initFooter?.();
     });
   }
 
-  /* ---------- link icons sync ---------- */
+  // ---------- Link icons sync ----------
   function refreshLinkIcons() {
-    const isDark = document.body.classList.contains('night-mode');
+    const isDark = document.body.classList.contains("night-mode");
     document.querySelectorAll('.link-icon img[data-name]').forEach(img => {
       const name = img.dataset.name;
-      img.src = `images/${name}-${isDark ? 'dark' : 'light'}.svg`;
+      img.src = `images/${name}-${isDark ? "dark" : "light"}.svg`;
     });
   }
 
-  /* ---------- theme toggle ---------- */
-if (themeToggle) {
-  themeToggle.addEventListener("change", () => {
-    // play sound (safe-guarded)
-    try {
-      toggleSound.currentTime = 0;
-      toggleSound.play().catch(() => {});
-    } catch {}
+  // ---------- THEME TOGGLE (no ding; plays one-shot cue only on click) ----------
+  if (themeToggle) {
+    themeToggle.addEventListener("change", async () => {
+      // NO toggle sound here (per your request)
 
-    body.classList.toggle("night-mode");
-    body.classList.toggle("day-mode");
-    refreshAmbientFX();
+      body.classList.toggle("night-mode");
+      body.classList.toggle("day-mode");
 
-    const isNight = body.classList.contains("night-mode");
-    document.querySelectorAll(".folder").forEach(f => {
-      f.src = isNight ? "images/folder-dark.svg" : "images/folder-light.svg";
+      // play theme cue ONCE per toggle
+      await playThemeCueOnce();
+
+      // visuals
+      refreshAmbientFX();
+      const isNight = body.classList.contains("night-mode");
+
+      document.querySelectorAll(".folder").forEach(f => {
+        f.src = isNight ? "images/folder-dark.svg" : "images/folder-light.svg";
+      });
+      if (angelaIllustration) {
+        angelaIllustration.src = isNight ? "images/angela-dark.svg" : "images/angela-light.svg";
+      }
+      const contactIllu = document.querySelector("#window-contact .contact-illustration");
+      if (contactIllu) {
+        contactIllu.src = isNight ? "images/angela-dark-heart.svg" : "images/angela-light-heart.svg";
+      }
+      refreshLinkIcons();
     });
-    if (angelaIllustration) {
-      angelaIllustration.src = isNight ? "images/angela-dark.svg" : "images/angela-light.svg";
-    }
-    const contactIllu = document.querySelector("#window-contact .contact-illustration");
-    if (contactIllu) {
-      contactIllu.src = isNight ? "images/angela-dark-heart.svg" : "images/angela-light-heart.svg";
-    }
-    refreshLinkIcons();
-  });
-}
+  }
 
-
-  /* ---------- FAQ helpers ---------- */
+  // ---------- FAQ ----------
   function getFaqContent() {
     const items = [
       { q: "what software do you use?",
         a: `<ul>
-              <li><strong>coding:</strong> Visual Studio Code! </li>
-              <li><strong>design:</strong> Figma or Canva </li>
-              <li><strong>courses:</strong> Youtube or Coursera? </li>
-              <li>you can pm me...owo</li>
+              <li><strong>coding:</strong> Visual Studio Code!</li>
+              <li><strong>design:</strong> Figma or Canva</li>
+              <li><strong>courses:</strong> Youtube or Coursera?</li>
+              <li>you can pm me... owo</li>
             </ul>`},
       { q: "what are your rates?", a: "i'm currently at 10-12$/hour!" },
       { q: "what languages do you usually use?", a: "html, css, and js! (for now)" },
@@ -285,11 +329,10 @@ if (themeToggle) {
             <div class="faq-a"${i===0?' style="max-height:400px"':''}>
               <div class="faq-a-inner">${it.a}</div>
             </div>
-          </div>`).join('')}
+          </div>`).join("")}
       </div>`;
-    
-    }
-  /* ---------- FAQ init ---------- */
+  }
+
   function initFaq(root) {
     const items = root.querySelectorAll(".faq-item");
     items.forEach((it) => {
@@ -311,9 +354,9 @@ if (themeToggle) {
     });
   }
 
-  /* ---------- Links window ---------- */
+  // ---------- Links ----------
   function getLinksContent() {
-    const isDarkMode = document.body.classList.contains('night-mode');
+    const isDarkMode = document.body.classList.contains("night-mode");
     const links = [
       { href: "https://twitter.com/mryanglrts", name: "twitter" },
       { href: "https://facebook.com/assistwithmva", name: "facebook" },
@@ -326,7 +369,7 @@ if (themeToggle) {
           ${links.map(l => `
             <a class="link-card" href="${l.href}" target="_blank" rel="noopener">
               <div class="link-icon">
-                <img src="images/${l.name}-${isDarkMode ? 'dark' : 'light'}.svg"
+                <img src="images/${l.name}-${isDarkMode ? "dark" : "light"}.svg"
                      alt="${l.name} icon" data-name="${l.name}" loading="lazy"/>
               </div>
               <div class="link-label">${l.name}</div>
@@ -336,175 +379,168 @@ if (themeToggle) {
       </div>`;
   }
 
- // ===== Lightbox Carousel =====
-function openLightboxGallery(slides, startAt = 0) {
-  if (!slides?.length) return;
+  // ---------- Lightbox ----------
+  function openLightboxGallery(slides, startAt = 0) {
+    if (!slides?.length) return;
+    const isNight = document.body.classList.contains("night-mode");
+    let i = Math.max(0, Math.min(startAt, slides.length - 1));
 
-  const isNight = document.body.classList.contains('night-mode');
-  let i = Math.max(0, Math.min(startAt, slides.length - 1));
+    const overlay = document.createElement("div");
+    overlay.className = "lightbox-overlay " + (isNight ? "night-mode" : "day-mode");
+    overlay.innerHTML = `
+      <div class="lightbox-panel" role="dialog" aria-label="gallery">
+        <button class="lb-close" aria-label="Close">×</button>
+        <button class="lb-prev" aria-label="Previous">‹</button>
+        <img class="lb-img" src="" alt="">
+        <button class="lb-next" aria-label="Next">›</button>
+        <div class="lightbox-caption"></div>
+        <div class="lightbox-count"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
 
-  const overlay = document.createElement('div');
-  overlay.className = 'lightbox-overlay ' + (isNight ? 'night-mode' : 'day-mode');
-  overlay.innerHTML = `
-    <div class="lightbox-panel" role="dialog" aria-label="gallery">
-      <button class="lb-close" aria-label="Close">×</button>
-      <button class="lb-prev" aria-label="Previous">‹</button>
-      <img class="lb-img" src="" alt="">
-      <button class="lb-next" aria-label="Next">›</button>
-      <div class="lightbox-caption"></div>
-      <div class="lightbox-count"></div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
+    const imgEl   = overlay.querySelector(".lb-img");
+    const capEl   = overlay.querySelector(".lightbox-caption");
+    const countEl = overlay.querySelector(".lightbox-count");
 
-  const imgEl   = overlay.querySelector('.lb-img');
-  const capEl   = overlay.querySelector('.lightbox-caption');
-  const countEl = overlay.querySelector('.lightbox-count');
+    function render() {
+      const s = slides[i];
+      imgEl.src = s.src;
+      imgEl.alt = s.title || "";
+      capEl.textContent = s.title || "";
+      countEl.textContent = `${i+1} / ${slides.length}`;
+    }
 
-  function render() {
-    const s = slides[i];
-    imgEl.src = s.src;
-    imgEl.alt = s.title || '';
-    capEl.textContent = s.title || '';
-    countEl.textContent = `${i+1} / ${slides.length}`;
+    function close() {
+      document.removeEventListener("keydown", onKey);
+      overlay.remove();
+    }
+    function next() { i = (i + 1) % slides.length; render(); }
+    function prev() { i = (i - 1 + slides.length) % slides.length; render(); }
+
+    function onKey(e) {
+      if (e.key === "Escape") return close();
+      if (e.key === "ArrowRight") return next();
+      if (e.key === "ArrowLeft")  return prev();
+    }
+
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+    overlay.querySelector(".lb-close").addEventListener("click", close);
+    overlay.querySelector(".lb-next").addEventListener("click", next);
+    overlay.querySelector(".lb-prev").addEventListener("click", prev);
+    document.addEventListener("keydown", onKey);
+
+    // basic swipe
+    let sx = 0, sy = 0;
+    overlay.addEventListener("touchstart",  e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
+    overlay.addEventListener("touchend",    e => {
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = Math.abs(e.changedTouches[0].clientY - sy);
+      if (Math.abs(dx) > 40 && dy < 60) (dx < 0 ? next() : prev());
+    }, {passive:true});
+
+    render();
   }
 
-  function close() {
-    document.removeEventListener('keydown', onKey);
-    overlay.remove();
-  }
-  function next() { i = (i + 1) % slides.length; render(); }
-  function prev() { i = (i - 1 + slides.length) % slides.length; render(); }
-
-  function onKey(e) {
-    if (e.key === 'Escape') return close();
-    if (e.key === 'ArrowRight') return next();
-    if (e.key === 'ArrowLeft')  return prev();
-  }
-
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-  overlay.querySelector('.lb-close').addEventListener('click', close);
-  overlay.querySelector('.lb-next').addEventListener('click', next);
-  overlay.querySelector('.lb-prev').addEventListener('click', prev);
-  document.addEventListener('keydown', onKey);
-
-  // basic swipe
-  let sx = 0, sy = 0;
-  overlay.addEventListener('touchstart',  e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
-  overlay.addEventListener('touchend',    e => {
-    const dx = e.changedTouches[0].clientX - sx;
-    const dy = Math.abs(e.changedTouches[0].clientY - sy);
-    if (Math.abs(dx) > 40 && dy < 60) (dx < 0 ? next() : prev());
-  }, {passive:true});
-
-  render();
-}
-
-function initLightbox(rootEl) {
-  if (!rootEl) return;
-  rootEl.querySelectorAll('.lightbox-card').forEach((card) => {
-    const run = () => {
-      // Prefer data-gallery (JSON array). Fallback to data-img.
-      const galleryAttr = card.getAttribute('data-gallery');
-      if (galleryAttr) {
-        let slides;
-        try {
-          slides = JSON.parse(galleryAttr);
-        } catch {
-          slides = [];
+  function initLightbox(rootEl) {
+    if (!rootEl) return;
+    rootEl.querySelectorAll(".lightbox-card").forEach((card) => {
+      const run = () => {
+        const galleryAttr = card.getAttribute("data-gallery");
+        if (galleryAttr) {
+          let slides;
+          try { slides = JSON.parse(galleryAttr); } catch { slides = []; }
+          if (slides.length) return openLightboxGallery(slides, 0);
         }
-        if (slides.length) return openLightboxGallery(slides, 0);
-      }
-      const single = card.dataset.img ? [{ src: card.dataset.img, title: card.dataset.title || card.textContent.trim() }] : [];
-      openLightboxGallery(single, 0);
-    };
+        const single = card.dataset.img ? [{ src: card.dataset.img, title: card.dataset.title || card.textContent.trim() }] : [];
+        openLightboxGallery(single, 0);
+      };
 
-    card.addEventListener('click', run);
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); run(); }
+      card.addEventListener("click", run);
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); run(); }
+      });
     });
-  });
-}
+  }
 
-
-
+  // ---------- Works content ----------
   function getWorksContent() {
-  return `
-    <div class="works">
-      <div class="works-banner">
-        <strong>please do offer me a job</strong> via my <a href="mailto:mryangelaworks@gmail.com">work email</a>!
-        <div class="works-sub">i do web design, admin work, social media, and anything you want me to do... :)</div>
-      </div>
+    return `
+      <div class="works">
+        <div class="works-banner">
+          <strong>please do offer me a job</strong> via my <a href="mailto:mryangelaworks@gmail.com">work email</a>!
+          <div class="works-sub">i do web design, admin work, social media, and anything you want me to do... :)</div>
+        </div>
 
-      <div class="works-chips">
-        <section>
-          <h3>TOOLS I KNOW</h3>
-          <div class="chip-grid">
-            <span class="chip">Figma</span><span class="chip">Visual Studio Code</span>
-            <span class="chip">Canva</span><span class="chip">Google Workspace</span>
-            <span class="chip">Meta Ads</span><span class="chip">Excel Sheets</span>
-            <span class="chip">Photoshop</span><span class="chip">Illustrator</span>
-          </div>
-        </section>
-        <section>
-          <h3>DEVELOPMENT</h3>
-          <div class="chip-grid">
-            <span class="chip">HTML/CSS</span><span class="chip">JavaScript</span>
-            <span class="chip">React</span><span class="chip">Next.js</span>
-            <span class="chip">C#</span><span class="chip">C</span><span class="chip">Python</span>
-          </div>
-        </section>
-      </div>
+        <div class="works-chips">
+          <section>
+            <h3>TOOLS I KNOW</h3>
+            <div class="chip-grid">
+              <span class="chip">Figma</span><span class="chip">Visual Studio Code</span>
+              <span class="chip">Canva</span><span class="chip">Google Workspace</span>
+              <span class="chip">Meta Ads</span><span class="chip">Excel Sheets</span>
+              <span class="chip">Photoshop</span><span class="chip">Illustrator</span>
+            </div>
+          </section>
+          <section>
+            <h3>DEVELOPMENT</h3>
+            <div class="chip-grid">
+              <span class="chip">HTML/CSS</span><span class="chip">JavaScript</span>
+              <span class="chip">React</span><span class="chip">Next.js</span>
+              <span class="chip">C#</span><span class="chip">C</span><span class="chip">Python</span>
+            </div>
+          </section>
+        </div>
 
-    <section class="works-section">
-  <h3>GRAPHICS</h3>
-  <div class="card-grid">
-    <div class="card lightbox-card" tabindex="0"
-         data-gallery='[
-           {"src":"images/theater-design.jpg","title":"Evening of Shorts – Main poster"},
-           {"src":"images/theater-design-2.jpg","title":"2nd Proposed Design"},
-           {"src":"images/theater-design-3.jpg","title":"A New Design"},
-           {"src":"images/theater-design-4.jpg","title":"Another New Design"}
-         ]'>
-      <div class="thumb" style="background-image:url(images/theater-thumb.jpg); background-size:cover; background-position:center;"></div>
-      <div class="card-title">TMCP - Theater</div>
-    </div>
+        <section class="works-section">
+          <h3>GRAPHICS</h3>
+          <div class="card-grid">
             <div class="card lightbox-card" tabindex="0"
-         data-gallery='[
-           {"src":"images/omnitend/omnitend-1.jpg","title":"Logo Design"},
-           {"src":"images/omnitend/omnitend-2.jpg","title":"Omnitend Team (I work under Alice)"},
-           {"src":"images/omnitend/omnitend-3.jpg","title":"Automated Ordering Module"},
-           {"src":"images/omnitend/omnitend-4.jpg","title":"Inventory Management Module"},
-           {"src":"images/omnitend/omnitend-5.jpg","title":"Real Time Task Tracking Module"},
-           {"src":"images/omnitend/omnitend-6.jpg","title":"Revenue Module"},
-           {"src":"images/omnitend/omnitend-7.jpg","title":"Staf Rotas-"},
-           {"src":"images/omnitend/omnitend-8.jpg","title":"Web Shop - Module"}
-         ]'>
-      <div class="thumb" style="background-image:url(images/pos-omnitend-thumb.jpg); background-size:cover; background-position:center;"></div>
-      <div class="card-title">POS Design</div>
-    </div>
-  </div>
-</section>
+                 data-gallery='[
+                   {"src":"images/theater-design.jpg","title":"Evening of Shorts – Main poster"},
+                   {"src":"images/theater-design-2.jpg","title":"2nd Proposed Design"},
+                   {"src":"images/theater-design-3.jpg","title":"A New Design"},
+                   {"src":"images/theater-design-4.jpg","title":"Another New Design"}
+                 ]'>
+              <div class="thumb" style="background-image:url(images/theater-thumb.jpg); background-size:cover; background-position:center;"></div>
+              <div class="card-title">TMCP - Theater</div>
+            </div>
 
-      <section class="works-section">
-  <h3>WEB / UI</h3>
-  <div class="card-grid">
-    <!-- Card with thumbnail + external link -->
-    <a class="card" href="https://marymva.my.canva.site/portfolio" target="_blank" rel="noopener">
-      <div class="thumb" style="background-image:url(images/oldportfolio-thumb.jpg);"></div>
-      <div class="card-title">My Old Portfolio</div>
-    </a>
+            <div class="card lightbox-card" tabindex="0"
+                 data-gallery='[
+                   {"src":"images/omnitend/omnitend-1.jpg","title":"Logo Design"},
+                   {"src":"images/omnitend/omnitend-2.jpg","title":"Omnitend Team (I work under Alice)"},
+                   {"src":"images/omnitend/omnitend-3.jpg","title":"Automated Ordering Module"},
+                   {"src":"images/omnitend/omnitend-4.jpg","title":"Inventory Management Module"},
+                   {"src":"images/omnitend/omnitend-5.jpg","title":"Real Time Task Tracking Module"},
+                   {"src":"images/omnitend/omnitend-6.jpg","title":"Revenue Module"},
+                   {"src":"images/omnitend/omnitend-7.jpg","title":"Staf Rotas-"},
+                   {"src":"images/omnitend/omnitend-8.jpg","title":"Web Shop - Module"}
+                 ]'>
+              <div class="thumb" style="background-image:url(images/pos-omnitend-thumb.jpg); background-size:cover; background-position:center;"></div>
+              <div class="card-title">POS Design</div>
+            </div>
+          </div>
+        </section>
 
-    <a class="card" href="https://thecollectivemic.wixsite.com/the-collective2014" target="_blank" rel="noopener">
-      <div class="thumb" style="background-image:url(images/tcmp-website.jpg);"></div>
-      <div class="card-title">TMCP - Website 2023</div>
-    </a>
-  </div>
-    </div>`
-}
+        <section class="works-section">
+          <h3>WEB / UI</h3>
+          <div class="card-grid">
+            <a class="card" href="https://marymva.my.canva.site/portfolio" target="_blank" rel="noopener">
+              <div class="thumb" style="background-image:url(images/oldportfolio-thumb.jpg);"></div>
+              <div class="card-title">My Old Portfolio</div>
+            </a>
 
+            <a class="card" href="https://thecollectivemic.wixsite.com/the-collective2014" target="_blank" rel="noopener">
+              <div class="thumb" style="background-image:url(images/tcmp-website.jpg);"></div>
+              <div class="card-title">TMCP - Website 2023</div>
+            </a>
+          </div>
+        </section>
+      </div>`;
+  }
 
-  /* ---------- Folders data ---------- */
+  // ---------- Folders data ----------
   const folderData = [
     { id: "works",   label: "my works",   x: 100,  y: 150, content: getWorksContent() },
     {
@@ -516,7 +552,7 @@ function initLightbox(rootEl) {
             the easiest way to contact me is through email! i don’t really have any official social medias for work,
             so please direct questions to my work email instead.
           </p>
-          <img src="${document.body.classList.contains('night-mode') ? 'images/angela-dark-heart.svg' : 'images/angela-light-heart.svg'}"
+          <img src="${document.body.classList.contains("night-mode") ? "images/angela-dark-heart.svg" : "images/angela-light-heart.svg"}"
                alt="Angela heart" class="contact-illustration"/>
           <p class="contact-email">
             email me at: <a href="mailto:mryangelaworks@gmail.com">mryangelaworks@gmail.com</a>
@@ -548,7 +584,7 @@ function initLightbox(rootEl) {
               <li>edit reels & make my clients smile</li>
             </ul>
             <p>let’s work together! contact me at 
-            <a href="mailto:mryangelaworks@gmail.com">mryangelaworks@gmail.com</a>✨</p>
+            <a href="mailto:mryangelaworks@gmail.com">mryangelaworks@gmail.com</a> ✨</p>
           </div>
           <hr />
           <div class="about-edu">
@@ -583,60 +619,124 @@ function initLightbox(rootEl) {
         </div>`
     },
     {
-  id: "resume",
-  label: "resume",
-  x: 1500,   // tweak position as you like
-  y: 220,
-  content: `
-    <div class="resume-window" style="text-align:center; padding:20px;">
-      <p style="margin-bottom:12px;">thanks for checking me out ♡</p>
-      <a href="my-resume.pdf" target="_blank" rel="noopener" class="resume-button">
-        open my resume here! :)
-      </a>
-      <p class="links-note" style="margin-top:12px;">it will open in a new tab.</p>
-    </div>
-  `
-}, 
-{
-  id: "faq",
-  label: "faq",
-  x: 1500,  // place wherever you want
-  y: 560,
-  content: getFaqContent()
-},
-{
-  id: "guestbook",
-  label: "message board",
-  x: 1600,   // place it where you want
-  y: 80,
-  content: `
-    <div class="guestbook-root">
-      <h2 style="margin:0 0 8px;">people say...♡</h2>
-      <form class="guestbook-form">
-        <div class="row">
-          <input name="name" type="text" placeholder="your name (optional)" maxlength="40"/>
-        </div>
-        <div class="row">
-          <textarea name="msg" placeholder="say something nice (pls) :)" maxlength="1000" required></textarea>
-        </div>
-        <button type="submit" class="guestbook-btn">post</button>
-        <span class="guestbook-status" aria-live="polite"></span>
-      </form>
-      <hr/>
-      <div class="guestbook-list" aria-live="polite"></div>
-    </div>
-  `
-}
-
-
+      id: "resume",
+      label: "resume",
+      x: 1500,
+      y: 220,
+      content: `
+        <div class="resume-window" style="text-align:center; padding:20px;">
+          <p style="margin-bottom:12px;">thanks for checking me out ♡</p>
+          <a href="my-resume.pdf" target="_blank" rel="noopener" class="resume-button">
+            open my resume here! :)
+          </a>
+          <p class="links-note" style="margin-top:12px;">it will open in a new tab.</p>
+        </div>`
+    },
+    {
+      id: "faq",
+      label: "faq",
+      x: 1500,
+      y: 560,
+      content: getFaqContent()
+    },
+    {
+      id: "guestbook",
+      label: "message board",
+      x: 1600,
+      y: 80,
+      content: `
+        <div class="guestbook-root">
+          <h2 style="margin:0 0 8px;">people say...♡</h2>
+          <form class="guestbook-form">
+            <div class="row">
+              <input name="name" type="text" placeholder="your name (optional)" maxlength="40"/>
+            </div>
+            <div class="row">
+              <textarea name="msg" placeholder="say something nice (pls) :)" maxlength="1000" required></textarea>
+            </div>
+            <button type="submit" class="guestbook-btn">post</button>
+            <span class="guestbook-status" aria-live="polite"></span>
+          </form>
+          <hr/>
+          <div class="guestbook-list" aria-live="polite"></div>
+        </div>`
+    }
   ];
 
-  /* ---------- Folder click sound ---------- */
-  const clickAudio = new Audio('sounds/folder-click.mp3');
-  clickAudio.preload = 'auto';
-  clickAudio.volume  = 0.35;
+  // ---------- Guestbook (Firestore) ----------
+  function sanitize(str) { return String(str || "").trim(); }
 
-  /* ---------- Make folders ---------- */
+  function initGuestbook(rootEl) {
+    if (!rootEl) return;
+    const form   = rootEl.querySelector(".guestbook-form");
+    const listEl = rootEl.querySelector(".guestbook-list");
+    const status = rootEl.querySelector(".guestbook-status");
+
+    const escapeHTML = s => String(s||"").replace(/[<>&]/g, c => ({'<':"&lt;",'>':"&gt;","&":"&amp;"}[c]));
+
+    db.collection("guestbook")
+      .orderBy("createdAt", "desc")
+      .limit(100)
+      .onSnapshot((snap) => {
+        listEl.innerHTML = "";
+        snap.forEach((doc) => {
+          const d = doc.data();
+          const name = d.name ? d.name : "anonymous friend";
+          const ts = d.createdAt?.toDate ? d.createdAt.toDate() : new Date();
+          const item = document.createElement("div");
+          item.className = "gb-item";
+          item.innerHTML = `
+            <div class="gb-meta">${escapeHTML(name)} • <span>${ts.toLocaleString()}</span></div>
+            <div class="gb-text">${escapeHTML(d.msg)}</div>
+          `;
+          listEl.appendChild(item);
+        });
+      });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const name = sanitize(fd.get("name")).slice(0, 40);
+      const msg  = sanitize(fd.get("msg")).slice(0, 300);
+      if (!msg) { status.textContent = "say something first!"; return; }
+
+      const last = Number(localStorage.getItem("gb_last") || 0);
+      const now  = Date.now();
+      if (now - last < 30_000) { status.textContent = "whoa tiger—wait a few seconds!"; return; }
+
+      const temp = document.createElement("div");
+      temp.className = "gb-item pending";
+      const when = new Date();
+      temp.innerHTML = `
+        <div class="gb-meta">${escapeHTML(name || "you")} • <span>${when.toLocaleString()}</span></div>
+        <div class="gb-text">${escapeHTML(msg)} <em class="pending-note">(sending…)</em></div>
+      `;
+      listEl.prepend(temp);
+
+      status.textContent = "posting…";
+      try {
+        await db.collection("guestbook").add({
+          name,
+          msg,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          ua: navigator.userAgent.slice(0,120)
+        });
+        localStorage.setItem("gb_last", String(now));
+        form.reset();
+        status.textContent = "posted! ♡";
+        temp.remove();
+        setTimeout(() => (status.textContent = ""), 1200);
+      } catch (err) {
+        console.error(err);
+        const note = temp.querySelector(".pending-note");
+        if (note) note.textContent = "(failed to send)";
+        temp.classList.add("failed");
+        status.textContent = "oops, failed to post.";
+      }
+    });
+  }
+
+  // ---------- Create folder icons ----------
   if (folderContainer) {
     folderData.forEach((folder) => {
       const folderWrapper = document.createElement("div");
@@ -646,11 +746,11 @@ function initLightbox(rootEl) {
       folderWrapper.style.left = `${folder.x}px`;
 
       folderWrapper.tabIndex = 0;
-      folderWrapper.setAttribute('role', 'button');
-      folderWrapper.setAttribute('aria-label', folder.label);
+      folderWrapper.setAttribute("role", "button");
+      folderWrapper.setAttribute("aria-label", folder.label);
       folderWrapper.dataset.fid   = folder.id;
       folderWrapper.dataset.label = folder.label;
-      folderWrapper.addEventListener('mousedown', () => folderWrapper.focus());
+      folderWrapper.addEventListener("mousedown", () => folderWrapper.focus());
 
       const folderImg = document.createElement("img");
       folderImg.classList.add("folder");
@@ -680,17 +780,18 @@ function initLightbox(rootEl) {
   }
 
   // prevent page scroll on Space when folder focused
-  document.addEventListener('keydown', (e) => {
-    const isSpace = e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar' || e.code === 'Space';
-    const activeFolder = document.activeElement && document.activeElement.closest('.folder-wrapper');
+  document.addEventListener("keydown", (e) => {
+    const isSpace = e.key === " " || e.key === "Space" || e.key === "Spacebar" || e.code === "Space";
+    const activeFolder = document.activeElement && document.activeElement.closest(".folder-wrapper");
     if (activeFolder && isSpace) e.preventDefault();
   });
+
   // keyboard activation
-  document.addEventListener('keyup', (e) => {
-    const isEnter = e.key === 'Enter';
-    const isSpace = e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar' || e.code === 'Space';
+  document.addEventListener("keyup", (e) => {
+    const isEnter = e.key === "Enter";
+    const isSpace = e.key === " " || e.key === "Space" || e.key === "Spacebar" || e.code === "Space";
     if (!isEnter && !isSpace) return;
-    const activeFolder = document.activeElement && document.activeElement.closest('.folder-wrapper');
+    const activeFolder = document.activeElement && document.activeElement.closest(".folder-wrapper");
     if (!activeFolder) return;
     e.preventDefault();
     clickAudio.currentTime = 0;
@@ -700,7 +801,7 @@ function initLightbox(rootEl) {
     if (f) openWindow(f.id, f.label, f.content);
   });
 
-  /* ---------- Angela illustration clicks ---------- */
+  // ---------- Angela illustration clicks ----------
   if (angelaIllustration) {
     angelaIllustration.addEventListener("click", () => {
       angelaClickCount++;
@@ -736,92 +837,7 @@ function initLightbox(rootEl) {
     });
   }
 
-  function sanitize(str) {
-  // super basic guard; you can get fancier if you want
-  return String(str || "").trim();
-}
-
-function initGuestbook(rootEl) {
-  if (!rootEl) return;
-  const form   = rootEl.querySelector(".guestbook-form");
-  const listEl = rootEl.querySelector(".guestbook-list");
-  const status = rootEl.querySelector(".guestbook-status");
-
-  const escapeHTML = s => String(s||"").replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-
-  // live render from Firestore
-  db.collection("guestbook")
-    .orderBy("createdAt", "desc")
-    .limit(100)
-    .onSnapshot((snap) => {
-      listEl.innerHTML = "";
-      snap.forEach((doc) => {
-        const d = doc.data();
-        const name = d.name ? d.name : "anonymous friend";
-        const ts = d.createdAt?.toDate ? d.createdAt.toDate() : new Date();
-        const item = document.createElement("div");
-        item.className = "gb-item";
-        item.innerHTML = `
-          <div class="gb-meta">${escapeHTML(name)} • <span>${ts.toLocaleString()}</span></div>
-          <div class="gb-text">${escapeHTML(d.msg)}</div>
-        `;
-        listEl.appendChild(item);
-      });
-    });
-
-  // optimistic submit
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const fd = new FormData(form);
-    const name = String(fd.get("name") || "").trim().slice(0, 40);
-    const msg  = String(fd.get("msg")  || "").trim().slice(0, 300);
-    if (!msg) { status.textContent = "say something first!"; return; }
-
-    // rate limit: 30s
-    const last = Number(localStorage.getItem("gb_last") || 0);
-    const now  = Date.now();
-    if (now - last < 30_000) { status.textContent = "whoa tiger—wait a few seconds!"; return; }
-
-    // 1) show temp item immediately
-    const temp = document.createElement("div");
-    temp.className = "gb-item pending";
-    const when = new Date();
-    temp.innerHTML = `
-      <div class="gb-meta">${escapeHTML(name || "you")} • <span>${when.toLocaleString()}</span></div>
-      <div class="gb-text">${escapeHTML(msg)} <em class="pending-note">(sending…)</em></div>
-    `;
-    // put new messages on top
-    listEl.prepend(temp);
-
-    status.textContent = "posting…";
-    try {
-      await db.collection("guestbook").add({
-        name,
-        msg,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        ua: navigator.userAgent.slice(0,120)
-      });
-      localStorage.setItem("gb_last", String(now));
-      form.reset();
-      status.textContent = "posted! ♡";
-      // 2) remove the temp; real one will appear via onSnapshot
-      temp.remove();
-      setTimeout(() => (status.textContent = ""), 1200);
-    } catch (err) {
-      console.error(err);
-      // mark temp as failed
-      const note = temp.querySelector(".pending-note");
-      if (note) note.textContent = "(failed to send)";
-      temp.classList.add("failed");
-      status.textContent = "oops, failed to post.";
-    }
-  });
-}
-
-
-
-
-  /* ---------- open window ---------- */
+  // ---------- Window system ----------
   function openWindow(id, title, content) {
     if (document.getElementById(`window-${id}`)) return;
 
@@ -869,14 +885,12 @@ function initGuestbook(rootEl) {
     if (id === "faq") initFaq(win.querySelector(".window-content"));
     if (id === "links") refreshLinkIcons();
     if (id === "guestbook") initGuestbook(win.querySelector(".guestbook-root"));
-    if (id === "works") initLightbox(win);   // <-- add this line
-
+    if (id === "works") initLightbox(win);
 
     win.style.zIndex = ++highestZIndex;
     makeDraggable(win);
   }
 
-  /* ---------- dragging ---------- */
   function makeDraggable(el) {
     let pressed = false, dragging = false;
     let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
@@ -918,16 +932,14 @@ function initGuestbook(rootEl) {
     });
   }
 
-  // 💫 Expose closeWindow globally for the ✖ button
-window.closeWindow = function (id) {
-  const win = document.getElementById(`window-${id}`);
-  if (win) {
-    // Play close sound
-    const closeAudio = new Audio('sounds/folder-close.mp3');
-    closeAudio.volume = 0.35;
-    closeAudio.play().catch(() => {});
-
-    win.remove();
-  }
-};
+  // Expose closeWindow globally for the ✖ button
+  window.closeWindow = function (id) {
+    const win = document.getElementById(`window-${id}`);
+    if (win) {
+      const closeAudio = new Audio("sounds/folder-close.mp3");
+      closeAudio.volume = 0.35;
+      closeAudio.play().catch(() => {});
+      win.remove();
+    }
+  };
 });
