@@ -463,8 +463,8 @@ function initLightbox(rootEl) {
          data-gallery='[
            {"src":"images/theater-design.jpg","title":"Evening of Shorts – Main poster"},
            {"src":"images/theater-design-2.jpg","title":"2nd Proposed Design"},
-           {"src":"images/theater-design-3.jpg","title":"A New Deisgn for the Theater"},
-           {"src":"images/theater-design-4.jpg","title":"A New Deisgn for the Theater"}
+           {"src":"images/theater-design-3.jpg","title":"A New Design"},
+           {"src":"images/theater-design-4.jpg","title":"Another New Design"}
          ]'>
       <div class="thumb" style="background-image:url(images/theater-thumb.jpg); background-size:cover; background-position:center;"></div>
       <div class="card-title">TMCP - Theater</div>
