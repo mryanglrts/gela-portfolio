@@ -336,50 +336,173 @@ if (themeToggle) {
       </div>`;
   }
 
-  /* ---------- Works content ---------- */
-  function getWorksContent() {
-    return `
-      <div class="works">
-        <div class="works-banner">
-          <strong>please do offer me a job</strong> via my <a href="mailto:mryangelaworks@gmail.com">work email</a>!
-          <div class="works-sub">i do web design, admin work, social media, and anything you want me to do... :)</div>
-        </div>
-        <div class="works-chips">
-          <section>
-            <h3>TOOLS I KNOW</h3>
-            <div class="chip-grid">
-              <span class="chip">Figma</span><span class="chip">Visual Studio Code</span>
-              <span class="chip">Canva</span><span class="chip">Google Workspace</span>
-              <span class="chip">Meta Ads</span><span class="chip">Excel Sheets</span>
-              <span class="chip">Photoshop</span><span class="chip">Illustrator</span>
-            </div>
-          </section>
-          <section>
-            <h3>DEVELOPMENT</h3>
-            <div class="chip-grid">
-              <span class="chip">HTML/CSS</span><span class="chip">JavaScript</span>
-              <span class="chip">React</span><span class="chip">Next.js</span>
-              <span class="chip">C#</span><span class="chip">C</span><span class="chip">Python</span>
-            </div>
-          </section>
-        </div>
-        <hr class="works-rule"/>
-        <section class="works-section">
-          <h3>GRAPHICS</h3>
-          <div class="card-grid">
-            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">Theater Design</div></a>
-            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">POS Design</div></a>
-          </div>
-        </section>
-        <section class="works-section">
-          <h3>WEB / UI</h3>
-          <div class="card-grid">
-            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">soft-portfolio concept</div></a>
-            <a class="card" href="#" target="_blank" rel="noopener"><div class="thumb"></div><div class="card-title">friendster-reborn</div></a>
-          </div>
-        </section>
-      </div>`;
+ // ===== Lightbox Carousel =====
+function openLightboxGallery(slides, startAt = 0) {
+  if (!slides?.length) return;
+
+  const isNight = document.body.classList.contains('night-mode');
+  let i = Math.max(0, Math.min(startAt, slides.length - 1));
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay ' + (isNight ? 'night-mode' : 'day-mode');
+  overlay.innerHTML = `
+    <div class="lightbox-panel" role="dialog" aria-label="gallery">
+      <button class="lb-close" aria-label="Close">×</button>
+      <button class="lb-prev" aria-label="Previous">‹</button>
+      <img class="lb-img" src="" alt="">
+      <button class="lb-next" aria-label="Next">›</button>
+      <div class="lightbox-caption"></div>
+      <div class="lightbox-count"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const imgEl   = overlay.querySelector('.lb-img');
+  const capEl   = overlay.querySelector('.lightbox-caption');
+  const countEl = overlay.querySelector('.lightbox-count');
+
+  function render() {
+    const s = slides[i];
+    imgEl.src = s.src;
+    imgEl.alt = s.title || '';
+    capEl.textContent = s.title || '';
+    countEl.textContent = `${i+1} / ${slides.length}`;
   }
+
+  function close() {
+    document.removeEventListener('keydown', onKey);
+    overlay.remove();
+  }
+  function next() { i = (i + 1) % slides.length; render(); }
+  function prev() { i = (i - 1 + slides.length) % slides.length; render(); }
+
+  function onKey(e) {
+    if (e.key === 'Escape') return close();
+    if (e.key === 'ArrowRight') return next();
+    if (e.key === 'ArrowLeft')  return prev();
+  }
+
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  overlay.querySelector('.lb-close').addEventListener('click', close);
+  overlay.querySelector('.lb-next').addEventListener('click', next);
+  overlay.querySelector('.lb-prev').addEventListener('click', prev);
+  document.addEventListener('keydown', onKey);
+
+  // basic swipe
+  let sx = 0, sy = 0;
+  overlay.addEventListener('touchstart',  e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
+  overlay.addEventListener('touchend',    e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = Math.abs(e.changedTouches[0].clientY - sy);
+    if (Math.abs(dx) > 40 && dy < 60) (dx < 0 ? next() : prev());
+  }, {passive:true});
+
+  render();
+}
+
+function initLightbox(rootEl) {
+  if (!rootEl) return;
+  rootEl.querySelectorAll('.lightbox-card').forEach((card) => {
+    const run = () => {
+      // Prefer data-gallery (JSON array). Fallback to data-img.
+      const galleryAttr = card.getAttribute('data-gallery');
+      if (galleryAttr) {
+        let slides;
+        try {
+          slides = JSON.parse(galleryAttr);
+        } catch {
+          slides = [];
+        }
+        if (slides.length) return openLightboxGallery(slides, 0);
+      }
+      const single = card.dataset.img ? [{ src: card.dataset.img, title: card.dataset.title || card.textContent.trim() }] : [];
+      openLightboxGallery(single, 0);
+    };
+
+    card.addEventListener('click', run);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); run(); }
+    });
+  });
+}
+
+
+
+  function getWorksContent() {
+  return `
+    <div class="works">
+      <div class="works-banner">
+        <strong>please do offer me a job</strong> via my <a href="mailto:mryangelaworks@gmail.com">work email</a>!
+        <div class="works-sub">i do web design, admin work, social media, and anything you want me to do... :)</div>
+      </div>
+
+      <div class="works-chips">
+        <section>
+          <h3>TOOLS I KNOW</h3>
+          <div class="chip-grid">
+            <span class="chip">Figma</span><span class="chip">Visual Studio Code</span>
+            <span class="chip">Canva</span><span class="chip">Google Workspace</span>
+            <span class="chip">Meta Ads</span><span class="chip">Excel Sheets</span>
+            <span class="chip">Photoshop</span><span class="chip">Illustrator</span>
+          </div>
+        </section>
+        <section>
+          <h3>DEVELOPMENT</h3>
+          <div class="chip-grid">
+            <span class="chip">HTML/CSS</span><span class="chip">JavaScript</span>
+            <span class="chip">React</span><span class="chip">Next.js</span>
+            <span class="chip">C#</span><span class="chip">C</span><span class="chip">Python</span>
+          </div>
+        </section>
+      </div>
+
+    <section class="works-section">
+  <h3>GRAPHICS</h3>
+  <div class="card-grid">
+    <div class="card lightbox-card" tabindex="0"
+         data-gallery='[
+           {"src":"images/theater-design.jpg","title":"Evening of Shorts – Main poster"},
+           {"src":"images/theater-design-2.jpg","title":"2nd Proposed Design"},
+           {"src":"images/theater-design-3.jpg","title":"A New Deisgn for the Theater"},
+           {"src":"images/theater-design-4.jpg","title":"A New Deisgn for the Theater"}
+         ]'>
+      <div class="thumb" style="background-image:url(images/theater-thumb.jpg); background-size:cover; background-position:center;"></div>
+      <div class="card-title">TMCP - Theater</div>
+    </div>
+            <div class="card lightbox-card" tabindex="0"
+         data-gallery='[
+           {"src":"images/omnitend/omnitend-1.jpg","title":"Logo Design"},
+           {"src":"images/omnitend/omnitend-2.jpg","title":"Omnitend Team (I work under Alice)"},
+           {"src":"images/omnitend/omnitend-3.jpg","title":"Automated Ordering Module"},
+           {"src":"images/omnitend/omnitend-4.jpg","title":"Inventory Management Module"},
+           {"src":"images/omnitend/omnitend-5.jpg","title":"Real Time Task Tracking Module"},
+           {"src":"images/omnitend/omnitend-6.jpg","title":"Revenue Module"},
+           {"src":"images/omnitend/omnitend-7.jpg","title":"Staf Rotas-"},
+           {"src":"images/omnitend/omnitend-8.jpg","title":"Web Shop - Module"}
+         ]'>
+      <div class="thumb" style="background-image:url(images/pos-omnitend-thumb.jpg); background-size:cover; background-position:center;"></div>
+      <div class="card-title">POS Design</div>
+    </div>
+  </div>
+</section>
+
+      <section class="works-section">
+  <h3>WEB / UI</h3>
+  <div class="card-grid">
+    <!-- Card with thumbnail + external link -->
+    <a class="card" href="https://marymva.my.canva.site/portfolio" target="_blank" rel="noopener">
+      <div class="thumb" style="background-image:url(images/oldportfolio-thumb.jpg);"></div>
+      <div class="card-title">My Old Portfolio</div>
+    </a>
+
+    <a class="card" href="https://thecollectivemic.wixsite.com/the-collective2014" target="_blank" rel="noopener">
+      <div class="thumb" style="background-image:url(images/tcmp-website.jpg);"></div>
+      <div class="card-title">TMCP - Website 2023</div>
+    </a>
+  </div>
+    </div>`
+}
+
 
   /* ---------- Folders data ---------- */
   const folderData = [
@@ -746,6 +869,7 @@ function initGuestbook(rootEl) {
     if (id === "faq") initFaq(win.querySelector(".window-content"));
     if (id === "links") refreshLinkIcons();
     if (id === "guestbook") initGuestbook(win.querySelector(".guestbook-root"));
+    if (id === "works") initLightbox(win);   // <-- add this line
 
 
     win.style.zIndex = ++highestZIndex;
