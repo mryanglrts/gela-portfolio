@@ -73,6 +73,7 @@ async function playThemeCueOnce() {
 // DOM Ready
 // ---------------------------
 document.addEventListener("DOMContentLoaded", () => {
+  const isMobile = () => window.innerWidth <= 768;
   const helloScreen        = document.getElementById("hello-screen");
   const helloText          = document.getElementById("hello-text");
   const desktop            = document.getElementById("desktop");
@@ -82,6 +83,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const folderContainer    = document.getElementById("folders");
   const windowContainer    = document.getElementById("windows");
   const mainWindow         = document.getElementById("window-home");
+
+  // --- NEW bits for hello screen memory ---
+  const KEY_ENTERED = "gela_entered_desktop";
+
+  function enterDesktop() {
+    if (!helloScreen || !desktop) return;
+    helloScreen.style.display = "none";
+    desktop.classList.remove("hidden");
+    sessionStorage.setItem(KEY_ENTERED, "1");
+
+    if (mainWindow) {
+      requestAnimationFrame(() => {
+        if (typeof centerWindowEl === "function") centerWindowEl(mainWindow);
+        mainWindow.style.visibility = "visible";
+        mainWindow.style.opacity = "1";
+      });
+    }
+    window.initFooter?.();
+  }
+
+  // auto-skip hello if we already entered
+  if (sessionStorage.getItem(KEY_ENTERED) === "1") {
+    enterDesktop();
+  }
+
+  // click hello → desktop
+  if (helloText) {
+    helloText.addEventListener("click", enterDesktop);
+  }
+
 
   // ---------- Ambient FX ----------
   function ensureAmbientLayer() {
@@ -518,10 +549,50 @@ document.addEventListener("DOMContentLoaded", () => {
                    {"src":"images/omnitend/omnitend-8.jpg","title":"Web Shop - Module"}
                  ]'>
               <div class="thumb" style="background-image:url(images/pos-omnitend-thumb.jpg); background-size:cover; background-position:center;"></div>
-              <div class="card-title">POS Design</div>
+              <div class="card-title">Omnitend</div>
             </div>
-          </div>
-        </section>
+            
+          <div class="card lightbox-card" tabindex="0"
+         data-gallery='[
+           {"src":"images/eulclavie/1.png","title":"Poster A"},
+           {"src":"images/eulclavie/2.png","title":"Poster B"},
+           {"src":"images/eulclavie/3.png","title":"Social Media Carousel"},
+           {"src":"images/eulclavie/4.png","title":"Social Media Carousel"},
+           {"src":"images/eulclavie/5.png","title":"Social Media Carousel"},
+           {"src":"images/eulclavie/6.png","title":"Social Media Carousel"}
+         ]'>
+      <div class="thumb" style="background-image:url(images/eulclavie/eulclavie.png); background-size:cover; background-position:center;"></div>
+      <div class="card-title">EulClavie</div>
+    </div>
+
+          <div class="card lightbox-card" tabindex="0"
+         data-gallery='[
+           {"src":"images/gemguesthouse/1.png","title":"Poster A"},
+           {"src":"images/gemguesthouse/2.png","title":"Poster B"},
+           {"src":"images/gemguesthouse/3.png","title":"Social Media Carousel"}
+         ]'>
+      <div class="thumb" style="background-image:url(images/gemguesthouse/gemguesthouse.png); background-size:cover; background-position:center;"></div>
+      <div class="card-title">Gem Guest House</div>
+    </div>
+
+          <div class="card lightbox-card" tabindex="0"
+         data-gallery='[
+           {"src":"images/awritetoheal/1.png","title":"Poster A"},
+           {"src":"images/awritetoheal/2.png","title":"Poster B"},
+           {"src":"images/awritetoheal/3.png","title":"Social Media Carousel"},
+           {"src":"images/awritetoheal/4.png","title":"Social Media Carousel"},
+           {"src":"images/awritetoheal/5.png","title":"Social Media Carousel"},
+           {"src":"images/awritetoheal/6.png","title":"Social Media Carousel"},
+           {"src":"images/awritetoheal/7.png","title":"Social Media Carousel"},
+           {"src":"images/awritetoheal/8.png","title":"Social Media Carousel"},
+           {"src":"images/awritetoheal/9.png","title":"Social Media Carousel"}
+         ]'>
+      <div class="thumb" style="background-image:url(images/awritetoheal/awritetoheal.png); background-size:cover; background-position:center;"></div>
+      <div class="card-title">A Write to Heal</div>
+    </div>
+
+  </div>
+</section>
 
         <section class="works-section">
           <h3>WEB / UI</h3>
@@ -537,6 +608,8 @@ document.addEventListener("DOMContentLoaded", () => {
             </a>
           </div>
         </section>
+
+        
       </div>`;
   }
 
@@ -741,9 +814,11 @@ document.addEventListener("DOMContentLoaded", () => {
     folderData.forEach((folder) => {
       const folderWrapper = document.createElement("div");
       folderWrapper.classList.add("folder-wrapper");
-      folderWrapper.style.position = "absolute";
-      folderWrapper.style.top  = `${folder.y}px`;
-      folderWrapper.style.left = `${folder.x}px`;
+      if (!isMobile()) {
+        folderWrapper.style.position = "absolute";
+        folderWrapper.style.top  = `${folder.y}px`;
+        folderWrapper.style.left = `${folder.x}px`;
+      }
 
       folderWrapper.tabIndex = 0;
       folderWrapper.setAttribute("role", "button");
@@ -786,6 +861,52 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activeFolder && isSpace) e.preventDefault();
   });
 
+  // ========= Responsive folders =============
+const MOBILE_BP = 820;
+let originalFolderPos = new Map();
+
+function snapshotFolderPositions(){
+  originalFolderPos.clear();
+  document.querySelectorAll('.folder-wrapper').forEach(el => {
+    originalFolderPos.set(el, { left: el.style.left, top: el.style.top, pos: el.style.position });
+  });
+}
+
+function applyMobileFolderLayout(){
+  document.body.classList.add('mobile-folders');
+  document.querySelectorAll('.folder-wrapper').forEach(el => {
+    el.style.position = 'relative';
+    el.style.left = 'auto';
+    el.style.top = 'auto';
+  });
+}
+
+function applyDesktopFolderLayout(){
+  document.body.classList.remove('mobile-folders');
+  document.querySelectorAll('.folder-wrapper').forEach(el => {
+    const saved = originalFolderPos.get(el);
+    if (saved){
+      el.style.position = saved.pos || 'absolute';
+      el.style.left = saved.left || el.style.left;
+      el.style.top  = saved.top  || el.style.top;
+    }
+  });
+}
+
+function updateFolderLayoutForViewport(){
+  if (window.innerWidth <= MOBILE_BP) applyMobileFolderLayout();
+  else applyDesktopFolderLayout();
+}
+
+// take a snapshot once, after folders are created
+snapshotFolderPositions();
+updateFolderLayoutForViewport();
+window.addEventListener('resize', updateFolderLayoutForViewport);
+
+// Avoid scattering folders off-screen on small phones
+const scatterFoldersIfDesktop = () => window.innerWidth > MOBILE_BP;
+
+
   // keyboard activation
   document.addEventListener("keyup", (e) => {
     const isEnter = e.key === "Enter";
@@ -804,6 +925,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Angela illustration clicks ----------
   if (angelaIllustration) {
     angelaIllustration.addEventListener("click", () => {
+      
+        if (scatterFoldersIfDesktop()) {
+    document.querySelectorAll(".folder-wrapper").forEach(folder => {
+      folder.classList.add("show");
+      const randX = Math.floor(Math.random() * (window.innerWidth - 100));
+      const randY = Math.floor(Math.random() * (window.innerHeight - 100));
+      folder.style.left = `${randX}px`;
+      folder.style.top  = `${randY}px`;
+    });
+  } else {
+    // mobile: just show them neatly
+    document.querySelectorAll(".folder-wrapper").forEach(folder => {
+      folder.classList.add("show");
+    });
+  }
+
       angelaClickCount++;
       const isNight = body.classList.contains("night-mode");
 
@@ -892,6 +1029,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function makeDraggable(el) {
+      if (isMobile()) return;
     let pressed = false, dragging = false;
     let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
     const THRESHOLD = 8;
@@ -942,4 +1080,38 @@ document.addEventListener("DOMContentLoaded", () => {
       win.remove();
     }
   };
+
+   // Reload the page if the user resizes across the mobile breakpoint
+  let wasMobile = isMobile();
+  window.addEventListener("resize", () => {
+    const isNowMobile = isMobile();
+    if (isNowMobile !== wasMobile) {
+      window.location.reload();
+    }
+    wasMobile = isNowMobile;
 });
+
+function centerWindow(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const w = el.offsetWidth;
+  const h = el.offsetHeight;
+
+  el.style.position = "fixed";
+  el.style.left = `calc(50% - ${w / 2}px)`;
+  el.style.top = `calc(50% - ${h / 2}px)`;
+}
+
+// Center home window on load
+window.addEventListener("load", () => {
+  centerWindow("window-home");
+});
+
+// Keep it centered when resizing
+window.addEventListener("resize", () => {
+  centerWindow("window-home");
+});
+
+
+  });
