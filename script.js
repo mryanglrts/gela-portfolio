@@ -88,20 +88,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const KEY_ENTERED = "gela_entered_desktop";
 
   function enterDesktop() {
-    if (!helloScreen || !desktop) return;
-    helloScreen.style.display = "none";
-    desktop.classList.remove("hidden");
-    sessionStorage.setItem(KEY_ENTERED, "1");
+  if (!helloScreen || !desktop) return;
+  helloScreen.style.display = "none";
+  desktop.classList.remove("hidden");
+  sessionStorage.setItem(KEY_ENTERED, "1");
 
-    if (mainWindow) {
-      requestAnimationFrame(() => {
-        if (typeof centerWindowEl === "function") centerWindowEl(mainWindow);
-        mainWindow.style.visibility = "visible";
-        mainWindow.style.opacity = "1";
-      });
-    }
-    window.initFooter?.();
+  if (mainWindow) {
+    requestAnimationFrame(() => {
+      if (typeof centerWindowEl === "function") centerWindowEl(mainWindow);
+      mainWindow.style.visibility = "visible";
+      mainWindow.style.opacity = "1";
+      makeDraggable(mainWindow);              // ✅ make the main window draggable
+      mainWindow.style.zIndex = ++highestZIndex;
+    });
   }
+  window.initFooter?.();
+}
 
   // auto-skip hello if we already entered
   if (sessionStorage.getItem(KEY_ENTERED) === "1") {
@@ -278,24 +280,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => bubble.classList.remove("show"), 2000);
   }
 
-  // ---------- Hello → Desktop ----------
-  if (helloText) {
-    helloText.addEventListener("click", () => {
-      if (!helloScreen || !desktop) return;
-      helloScreen.style.display = "none";
-      desktop.classList.remove("hidden");
-
-      if (mainWindow) {
-        centerWindowEl(mainWindow);
-        mainWindow.style.visibility = "visible";
-        mainWindow.style.opacity = "1";
-        makeDraggable(mainWindow);
-        mainWindow.style.zIndex = ++highestZIndex;
-      }
-      window.initFooter?.();
-    });
-  }
-
   // ---------- Link icons sync ----------
   function refreshLinkIcons() {
     const isDark = document.body.classList.contains("night-mode");
@@ -341,13 +325,17 @@ document.addEventListener("DOMContentLoaded", () => {
         a: `<ul>
               <li><strong>coding:</strong> Visual Studio Code!</li>
               <li><strong>design:</strong> Figma or Canva</li>
-              <li><strong>courses:</strong> Youtube or Coursera?</li>
-              <li>you can pm me... owo</li>
+              <li><strong>admin:</strong> Google Workspace, Slack, Teams</li>
+              <li><strong>social media:</strong> Meta Ads, Canva, Photoshop</li>
+              <li><strong>other:</strong> Notion, Trello, Asana</li>
             </ul>`},
-      { q: "what are your rates?", a: "i'm currently at 10-12$/hour!" },
-      { q: "what languages do you usually use?", a: "html, css, and js! (for now)" },
-      { q: "where do you get your sound effects?", a: "free libraries, paid packs, and sometimes i record my own." },
-      { q: "do you draw?", a: "yes! im actually saving up for an ipad to create more illustrations :3" }
+      { q: "what are your rates?", a: "we can chat about this :)" },
+      { q: "what kind of executives have you supported?", a: "ceos, founders, and entrepreneurs in real estate, creative arts, nonprofits, and startups." },
+      { q: "what are your skills?", a: "designing, and lots of admin work" },
+      { q: "do you also help with marketing or social media tasks?", a: "yes! graphics, posts, and campaigns are part of my work." },
+      { q: "do you prefer long-term roles or short-term contracts?", a: "i prefer long-term but i’m open to impactful short-term work." },
+      { q: "what timezone are you in?", a: "i’m in the philippines (gmt+8)." },
+      { q: "what are your working hours?", a: "i can work 4-6 hours a day, monday to friday. i’m flexible with time." }
     ];
     return `
       <div class="faq">
@@ -549,43 +537,49 @@ document.addEventListener("DOMContentLoaded", () => {
                    {"src":"images/omnitend/omnitend-8.jpg","title":"Web Shop - Module"}
                  ]'>
               <div class="thumb" style="background-image:url(images/pos-omnitend-thumb.jpg); background-size:cover; background-position:center;"></div>
-              <div class="card-title">Omnitend</div>
+              <div class="card-title">Omnitend
+              <a href="https://www.instagram.com/omni_tend/" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗</a>
+              </div>
             </div>
             
           <div class="card lightbox-card" tabindex="0"
          data-gallery='[
-           {"src":"images/eulclavie/1.png","title":"Poster A"},
-           {"src":"images/eulclavie/2.png","title":"Poster B"},
-           {"src":"images/eulclavie/3.png","title":"Social Media Carousel"},
-           {"src":"images/eulclavie/4.png","title":"Social Media Carousel"},
-           {"src":"images/eulclavie/5.png","title":"Social Media Carousel"},
-           {"src":"images/eulclavie/6.png","title":"Social Media Carousel"}
+           {"src":"images/eulclavie/1.png","title":"Hiring Programmer Post"},
+           {"src":"images/eulclavie/2.png","title":"Hiring Executive Assistant Post"},
+           {"src":"images/eulclavie/3.png","title":"Hiring Marketing Post"},
+           {"src":"images/eulclavie/4.png","title":"EulClavie Ad Flyer for Email Marketing"},
+           {"src":"images/eulclavie/5.png","title":"Hiring Cold Callers Post"},
+           {"src":"images/eulclavie/6.png","title":"Hiring Data Virtual Assistants Post"},
          ]'>
       <div class="thumb" style="background-image:url(images/eulclavie/eulclavie.png); background-size:cover; background-position:center;"></div>
-      <div class="card-title">EulClavie</div>
+      <div class="card-title">EulClavie
+       <a href="https://www.facebook.com/EulClavie" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗</a>
+      </div>
     </div>
 
           <div class="card lightbox-card" tabindex="0"
          data-gallery='[
-           {"src":"images/gemguesthouse/1.png","title":"Poster A"},
-           {"src":"images/gemguesthouse/2.png","title":"Poster B"},
-           {"src":"images/gemguesthouse/3.png","title":"Social Media Carousel"}
+           {"src":"images/gemguesthouse/1.png","title":"Airbnb Social Media Post: You can check out their listing here!"},
+           {"src":"images/gemguesthouse/2.png","title":"Social Media Post"},
+           {"src":"images/gemguesthouse/3.png","title":"Social Media Post"}
          ]'>
       <div class="thumb" style="background-image:url(images/gemguesthouse/gemguesthouse.png); background-size:cover; background-position:center;"></div>
-      <div class="card-title">Gem Guest House</div>
+      <div class="card-title">Gem Guest House
+       <a href="https://airbnb.com/h/gemsguesthouse" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗</a>
+      </div>
     </div>
 
           <div class="card lightbox-card" tabindex="0"
          data-gallery='[
-           {"src":"images/awritetoheal/1.png","title":"Poster A"},
-           {"src":"images/awritetoheal/2.png","title":"Poster B"},
-           {"src":"images/awritetoheal/3.png","title":"Social Media Carousel"},
-           {"src":"images/awritetoheal/4.png","title":"Social Media Carousel"},
+           {"src":"images/awritetoheal/1.png","title":"Social Media Campaign"},
+           {"src":"images/awritetoheal/2.png","title":"Social Media Campaign 2"},
+           {"src":"images/awritetoheal/3.png","title":"Social Media Campaign 3"},
+           {"src":"images/awritetoheal/4.png","title":"Email Marketing Design"},
            {"src":"images/awritetoheal/5.png","title":"Social Media Carousel"},
-           {"src":"images/awritetoheal/6.png","title":"Social Media Carousel"},
-           {"src":"images/awritetoheal/7.png","title":"Social Media Carousel"},
-           {"src":"images/awritetoheal/8.png","title":"Social Media Carousel"},
-           {"src":"images/awritetoheal/9.png","title":"Social Media Carousel"}
+           {"src":"images/awritetoheal/6.png","title":"Donation Drive Post"},
+           {"src":"images/awritetoheal/7.png","title":"Marketing Campaign Post"},
+           {"src":"images/awritetoheal/8.png","title":"Email Marketing Design 2"},
+           {"src":"images/awritetoheal/9.png","title":"Email Marketing Design 3"}
          ]'>
       <div class="thumb" style="background-image:url(images/awritetoheal/awritetoheal.png); background-size:cover; background-position:center;"></div>
       <div class="card-title">A Write to Heal</div>
@@ -643,8 +637,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="images/angela-dark-woah.svg" class="about-img" />
             <div class="about-intro">
               <h2 class="about-name">Mary Angela</h2>
-              <p class="about-title">Aspiring web designer & creative wannabe</p>
-              <p class="about-subtitle">i can be anything you want me to be tbh</p>
+              <p class="about-title">PH-based freelancer</p>
+              <p class="about-subtitle">Former Executive Operations Manager at EulClavie</p>
             </div>
           </div>
           <hr />
@@ -652,8 +646,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <p>hi! i’m angela, and i like to...</p>
             <ul>
               <li>design cute portfolios & websites & graphics</li>
-              <li>draw soft illustrations & write silly fanfics</li>
-              <li>create organized excel sheets for your data</li>
+              <li>draw soft illustrations & write</li>
+              <li>create organized excel sheets & admin work</li>
               <li>edit reels & make my clients smile</li>
             </ul>
             <p>let’s work together! contact me at 
@@ -669,7 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <h3 class="edu-title">OTHER INTERESTS</h3>
             <ul style="list-style: disc; padding-left: 20px;">
               <li>professional gaming</li>
-              <li>music! singing, guitar, piano, violin</li>
+              <li>music! singing, guitar, piano</li>
               <li>league of legends</li>
               <li>skyrim, elder scrolls</li>
               <li>astrology and tarot cards!</li>
