@@ -67,6 +67,25 @@
   <button class="md-close" aria-label="dismiss notice">✕</button>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const disclaimer = document.getElementById("mobile-disclaimer");
+  const closeBtn = disclaimer?.querySelector(".md-close");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      disclaimer.classList.add("is-hidden");
+      localStorage.setItem("hideDisclaimer", "true");
+    });
+  }
+
+  if (localStorage.getItem("hideDisclaimer") === "true") {
+    disclaimer.classList.add("is-hidden");
+  }
+});
+</script>
+</body>
+
 
 </body>
 

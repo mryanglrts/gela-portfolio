@@ -1167,8 +1167,6 @@ function scatterAllFoldersPercent(){
 
 
 
-    
-
   // Expose closeWindow globally for the ✖ button
   window.closeWindow = function (id) {
     const win = document.getElementById(`window-${id}`);
@@ -1179,6 +1177,9 @@ function scatterAllFoldersPercent(){
       win.remove();
     }
   };
+
+
+  
 
 
 
