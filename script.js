@@ -81,6 +81,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggle        = document.getElementById("theme-toggle");
   const body               = document.body;
   const folderContainer    = document.getElementById("folders");
+
+    // --- percent helpers for folder positions ---
+  function clamp(n, min, max){ return Math.max(min, Math.min(n, max)); }
+  function pxToPct(px, total){ return total ? (px / total) * 100 : 0; }
+  function pctToPx(pct, total){ return (pct / 100) * total; }
+
+  function getContainerRect(){
+    const el = folderContainer || document.body;
+    return el.getBoundingClientRect();
+  }
+
+  function applyFolderPercent(el){
+    const x = parseFloat(el.dataset.x) || 0;
+    const y = parseFloat(el.dataset.y) || 0;
+    el.style.left = `${x}%`;
+    el.style.top  = `${y}%`;
+  }
+
+  function clampFolderPercent(el){
+    const rect = el.getBoundingClientRect();
+    const parent = getContainerRect();
+    let x = parseFloat(el.dataset.x) || 0;
+    let y = parseFloat(el.dataset.y) || 0;
+    const xMax = Math.max(0, 100 - pxToPct(rect.width,  parent.width));
+    const yMax = Math.max(0, 100 - pxToPct(rect.height, parent.height));
+    x = clamp(x, 0, xMax);
+    y = clamp(y, 0, yMax);
+    el.dataset.x = x.toFixed(2);
+    el.dataset.y = y.toFixed(2);
+    el.style.left = `${x}%`;
+    el.style.top  = `${y}%`;
+  }
+
+
+
   const windowContainer    = document.getElementById("windows");
   const mainWindow         = document.getElementById("window-home");
 
@@ -808,11 +843,19 @@ document.addEventListener("DOMContentLoaded", () => {
     folderData.forEach((folder) => {
       const folderWrapper = document.createElement("div");
       folderWrapper.classList.add("folder-wrapper");
-      if (!isMobile()) {
-        folderWrapper.style.position = "absolute";
-        folderWrapper.style.top  = `${folder.y}px`;
-        folderWrapper.style.left = `${folder.x}px`;
-      }
+      folderWrapper.style.position = isMobile() ? "relative" : "absolute";
+  if (!isMobile()) {
+  const parent = getContainerRect();
+  const seedX = pxToPct(folder.x, parent.width);
+  const seedY = pxToPct(folder.y, parent.height);
+
+  folderWrapper.dataset.x = isFinite(seedX) ? seedX.toFixed(2) : "5";
+  folderWrapper.dataset.y = isFinite(seedY) ? seedY.toFixed(2) : "5";
+
+  applyFolderPercent(folderWrapper);
+  requestAnimationFrame(() => clampFolderPercent(folderWrapper));
+}
+
 
       folderWrapper.tabIndex = 0;
       folderWrapper.setAttribute("role", "button");
@@ -878,19 +921,27 @@ function applyMobileFolderLayout(){
 function applyDesktopFolderLayout(){
   document.body.classList.remove('mobile-folders');
   document.querySelectorAll('.folder-wrapper').forEach(el => {
-    const saved = originalFolderPos.get(el);
-    if (saved){
-      el.style.position = saved.pos || 'absolute';
-      el.style.left = saved.left || el.style.left;
-      el.style.top  = saved.top  || el.style.top;
+    el.style.position = 'absolute';
+    if (el.dataset.x == null || el.dataset.y == null) {
+      el.dataset.x = el.dataset.x ?? "5";
+      el.dataset.y = el.dataset.y ?? "5";
     }
+    clampFolderPercent(el); // applies % and keeps inside
   });
 }
+
 
 function updateFolderLayoutForViewport(){
   if (window.innerWidth <= MOBILE_BP) applyMobileFolderLayout();
   else applyDesktopFolderLayout();
 }
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > MOBILE_BP) {
+    document.querySelectorAll('.folder-wrapper').forEach(clampFolderPercent);
+  }
+});
+
 
 // take a snapshot once, after folders are created
 snapshotFolderPositions();
@@ -916,57 +967,58 @@ const scatterFoldersIfDesktop = () => window.innerWidth > MOBILE_BP;
     if (f) openWindow(f.id, f.label, f.content);
   });
 
-  // ---------- Angela illustration clicks ----------
-  if (angelaIllustration) {
-    angelaIllustration.addEventListener("click", () => {
-      
-        if (scatterFoldersIfDesktop()) {
-    document.querySelectorAll(".folder-wrapper").forEach(folder => {
-      folder.classList.add("show");
-      const randX = Math.floor(Math.random() * (window.innerWidth - 100));
-      const randY = Math.floor(Math.random() * (window.innerHeight - 100));
-      folder.style.left = `${randX}px`;
-      folder.style.top  = `${randY}px`;
-    });
-  } else {
-    // mobile: just show them neatly
-    document.querySelectorAll(".folder-wrapper").forEach(folder => {
-      folder.classList.add("show");
-    });
-  }
+function scatterAllFoldersPercent(){
+  const parent = getContainerRect();
+  document.querySelectorAll(".folder-wrapper").forEach(folder => {
+    folder.classList.add("show");
+    const rect = folder.getBoundingClientRect();
+    const xMax = Math.max(0, 100 - pxToPct(rect.width,  parent.width));
+    const yMax = Math.max(0, 100 - pxToPct(rect.height, parent.height));
+    const randX = Math.random() * xMax;
+    const randY = Math.random() * yMax;
+    folder.dataset.x = randX.toFixed(2);
+    folder.dataset.y = randY.toFixed(2);
+    applyFolderPercent(folder);
+  });
+}
 
-      angelaClickCount++;
-      const isNight = body.classList.contains("night-mode");
 
-      if (angelaClickCount > 14) {
-        angelaClickCount = 0;
-        angelaIllustration.src = isNight ? "images/angela-dark.svg" : "images/angela-light.svg";
-        showAngelaBubble("i'm okay i guess..");
-        return;
-      }
-      if (angelaClickCount >= 9) {
-        angelaIllustration.src = isNight ? "images/angela-dark-cry.svg" : "images/angela-light-cry.svg";
-        showAngelaBubble("stop it....i'm overstimulated!");
-        return;
-      }
-      if (angelaClickCount >= 5) {
-        angelaIllustration.src = isNight ? "images/angela-dark-angry.svg" : "images/angela-light-angry.svg";
-        showAngelaBubble("you can stop now.");
-        return;
-      }
-
-      angelaIllustration.src = isNight ? "images/angela-dark-smile.svg" : "images/angela-light-smile.svg";
-      showAngelaBubble("you actually clicked me!");
-
+ if (angelaIllustration) {
+  angelaIllustration.addEventListener("click", () => {
+    if (scatterFoldersIfDesktop()) {
+      scatterAllFoldersPercent();
+    } else {
+      // mobile: just show them neatly
       document.querySelectorAll(".folder-wrapper").forEach(folder => {
         folder.classList.add("show");
-        const randX = Math.floor(Math.random() * (window.innerWidth  - 100));
-        const randY = Math.floor(Math.random() * (window.innerHeight - 100));
-        folder.style.left = `${randX}px`;
-        folder.style.top  = `${randY}px`;
       });
-    });
-  }
+    }
+
+    angelaClickCount++;
+    const isNight = body.classList.contains("night-mode");
+
+    if (angelaClickCount > 14) {
+      angelaClickCount = 0;
+      angelaIllustration.src = isNight ? "images/angela-dark.svg" : "images/angela-light.svg";
+      showAngelaBubble("i'm okay i guess..");
+      return;
+    }
+    if (angelaClickCount >= 9) {
+      angelaIllustration.src = isNight ? "images/angela-dark-cry.svg" : "images/angela-light-cry.svg";
+      showAngelaBubble("stop it....i'm overstimulated!");
+      return;
+    }
+    if (angelaClickCount >= 5) {
+      angelaIllustration.src = isNight ? "images/angela-dark-angry.svg" : "images/angela-light-angry.svg";
+      showAngelaBubble("you can stop now.");
+      return;
+    }
+
+    angelaIllustration.src = isNight ? "images/angela-dark-smile.svg" : "images/angela-light-smile.svg";
+    showAngelaBubble("you actually clicked me!");
+  });
+}
+
 
   // ---------- Window system ----------
   function openWindow(id, title, content) {
@@ -1023,46 +1075,51 @@ const scatterFoldersIfDesktop = () => window.innerWidth > MOBILE_BP;
   }
 
   function makeDraggable(el) {
-      if (isMobile()) return;
-    let pressed = false, dragging = false;
-    let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
-    const THRESHOLD = 8;
+  if (isMobile()) return;
 
-    el.addEventListener("mousedown", (e) => {
-      pressed = true; dragging = false;
-      startX = e.clientX; startY = e.clientY;
-      offsetX = e.clientX - el.offsetLeft;
-      offsetY = e.clientY - el.offsetTop;
-      el.style.transition = "none";
-    });
+  let pressed = false, dragging = false;
+  let startX = 0, startY = 0;
+  let startXPct = 0, startYPct = 0;
+  const THRESHOLD = 8;
 
-    document.addEventListener("mousemove", (e) => {
-      if (!pressed) return;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
+  el.addEventListener("mousedown", (e) => {
+    pressed = true; dragging = false;
+    startX = e.clientX; startY = e.clientY;
+    startXPct = parseFloat(el.dataset.x) || 0;
+    startYPct = parseFloat(el.dataset.y) || 0;
+    el.style.transition = "none";
+  });
 
-      if (!dragging && (Math.abs(dx) > THRESHOLD || Math.abs(dy) > THRESHOLD)) {
-        dragging = true;
-        el.style.zIndex = ++highestZIndex;
-      }
-      if (dragging) {
-        let newLeft = e.clientX - offsetX;
-        let newTop  = e.clientY - offsetY;
-        newLeft = Math.max(0, Math.min(newLeft, window.innerWidth  - el.offsetWidth));
-        newTop  = Math.max(0, Math.min(newTop,  window.innerHeight - el.offsetHeight));
-        el.style.left = `${newLeft}px`;
-        el.style.top  = `${newTop}px`;
-      }
-    });
+  document.addEventListener("mousemove", (e) => {
+    if (!pressed) return;
+    const dxPx = e.clientX - startX;
+    const dyPx = e.clientY - startY;
 
-    document.addEventListener("mouseup", () => {
-      if (!pressed) return;
-      pressed = false;
-      el.style.transition = "all 0.4s ease";
-      el.__dragMoved = dragging;
-      setTimeout(() => { el.__dragMoved = false; }, 0);
-    });
-  }
+    if (!dragging && (Math.abs(dxPx) > THRESHOLD || Math.abs(dyPx) > THRESHOLD)) {
+      dragging = true;
+      el.style.zIndex = ++highestZIndex;
+    }
+    if (dragging) {
+      const parent = getContainerRect();
+      const dxPct = pxToPct(dxPx, parent.width);
+      const dyPct = pxToPct(dyPx, parent.height);
+      el.dataset.x = String(startXPct + dxPct);
+      el.dataset.y = String(startYPct + dyPct);
+      clampFolderPercent(el);
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (!pressed) return;
+    pressed = false;
+    el.style.transition = "all 0.4s ease";
+    el.__dragMoved = dragging;
+    setTimeout(() => { el.__dragMoved = false; }, 0);
+  });
+}
+
+
+    
 
   // Expose closeWindow globally for the ✖ button
   window.closeWindow = function (id) {
@@ -1075,15 +1132,7 @@ const scatterFoldersIfDesktop = () => window.innerWidth > MOBILE_BP;
     }
   };
 
-   // Reload the page if the user resizes across the mobile breakpoint
-  let wasMobile = isMobile();
-  window.addEventListener("resize", () => {
-    const isNowMobile = isMobile();
-    if (isNowMobile !== wasMobile) {
-      window.location.reload();
-    }
-    wasMobile = isNowMobile;
-});
+ 
 
 function centerWindow(id) {
   const el = document.getElementById(id);
