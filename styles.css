@@ -270,13 +270,6 @@ input:checked+.slider:before {
   animation: pop 0.3s ease;
 }
 
-#window-home {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  margin: 0;
-}
 
 
 
@@ -2032,8 +2025,26 @@ img, .thumb { max-width: 100%; height: auto; }
   .folder-label{ font-size: 14px; }
 }
 
-@media (min-width: 821px){
-  #folders { position: relative; width: 100%; height: 100%; }
-  .folder-wrapper { position: absolute !important; }
-  .folder { width: clamp(72px, 9vw, 120px); height: auto; }
+
+
+/* responsive window width + height caps */
+.window {
+  width: clamp(340px, 90vw, 720px);   /* replaces fixed 600px */
+  max-width: 96vw;                    /* safety */
+  max-height: 86dvh;                  /* you already use this later; keep it */
 }
+
+/* Home window stays centered */
+#window-home{
+  left:50%;
+  top:50%;
+  transform: translate(-50%, -50%);
+  animation: popCentered .3s ease;
+}
+
+/* Animation that preserves the translate */
+@keyframes popCentered{
+  0%   { transform: translate(-50%, -50%) scale(.9); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1);  opacity: 1; }
+}
+

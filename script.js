@@ -128,9 +128,19 @@ document.addEventListener("DOMContentLoaded", () => {
   desktop.classList.remove("hidden");
   sessionStorage.setItem(KEY_ENTERED, "1");
 
+// show Angela tip immediately (only once per session)
+if (!sessionStorage.getItem("gela_tip_shown")) {
+  showAngelaBubble(
+    "click me! the folders will scatter ✨ and yes, you can drag them too!",
+    30000 // show for 10 seconds
+  );
+  sessionStorage.setItem("gela_tip_shown", "1");
+}
+
+
+
   if (mainWindow) {
     requestAnimationFrame(() => {
-      if (typeof centerWindowEl === "function") centerWindowEl(mainWindow);
       mainWindow.style.visibility = "visible";
       mainWindow.style.opacity = "1";
       makeDraggable(mainWindow);              // ✅ make the main window draggable
@@ -239,8 +249,6 @@ document.addEventListener("DOMContentLoaded", () => {
     mainWindow.style.position   = "fixed";
     mainWindow.style.visibility = "hidden";
     mainWindow.style.opacity    = "0";
-    mainWindow.style.transform  = "none";
-    requestAnimationFrame(() => centerWindowEl(mainWindow));
   }
 
   // ---------- Corner Cat ----------
@@ -1077,46 +1085,86 @@ function scatterAllFoldersPercent(){
   function makeDraggable(el) {
   if (isMobile()) return;
 
+  // Folders use percent positioning; windows use pixels
+  const isFolder = el.classList.contains("folder-wrapper");
+
   let pressed = false, dragging = false;
   let startX = 0, startY = 0;
-  let startXPct = 0, startYPct = 0;
+  let startXPct = 0, startYPct = 0;   // for folders
+  let offsetX = 0, offsetY = 0;       // for windows
   const THRESHOLD = 8;
 
   el.addEventListener("mousedown", (e) => {
     pressed = true; dragging = false;
     startX = e.clientX; startY = e.clientY;
-    startXPct = parseFloat(el.dataset.x) || 0;
-    startYPct = parseFloat(el.dataset.y) || 0;
     el.style.transition = "none";
+
+    if (isFolder) {
+      // initialize percent start points
+      const parent = getContainerRect();
+      if (el.dataset.x == null || el.dataset.y == null) {
+        const rect = el.getBoundingClientRect();
+        // convert current px to %
+        el.dataset.x = ((rect.left - parent.left) / parent.width  * 100).toFixed(2);
+        el.dataset.y = ((rect.top  - parent.top ) / parent.height * 100).toFixed(2);
+      }
+      startXPct = parseFloat(el.dataset.x) || 0;
+      startYPct = parseFloat(el.dataset.y) || 0;
+    } else {
+      // WINDOW DRAGGING (pixels)
+      // If it’s centered with transform, freeze its current on-screen spot into left/top px
+      const cs = getComputedStyle(el);
+      if (cs.transform !== "none") {
+        const r = el.getBoundingClientRect();
+        el.style.left = `${r.left}px`;
+        el.style.top  = `${r.top}px`;
+        el.style.transform = "none";
+      }
+      offsetX = e.clientX - el.offsetLeft;
+      offsetY = e.clientY - el.offsetTop;
+    }
   });
 
   document.addEventListener("mousemove", (e) => {
     if (!pressed) return;
-    const dxPx = e.clientX - startX;
-    const dyPx = e.clientY - startY;
 
-    if (!dragging && (Math.abs(dxPx) > THRESHOLD || Math.abs(dyPx) > THRESHOLD)) {
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (!dragging && (Math.abs(dx) > THRESHOLD || Math.abs(dy) > THRESHOLD)) {
       dragging = true;
       el.style.zIndex = ++highestZIndex;
     }
-    if (dragging) {
+
+    if (!dragging) return;
+
+    if (isFolder) {
       const parent = getContainerRect();
-      const dxPct = pxToPct(dxPx, parent.width);
-      const dyPct = pxToPct(dyPx, parent.height);
+      const dxPct = (dx / parent.width)  * 100;
+      const dyPct = (dy / parent.height) * 100;
       el.dataset.x = String(startXPct + dxPct);
       el.dataset.y = String(startYPct + dyPct);
-      clampFolderPercent(el);
+      clampFolderPercent(el); // keeps it inside and writes left/top as %
+    } else {
+      let newLeft = e.clientX - offsetX;
+      let newTop  = e.clientY - offsetY;
+      // keep fully on screen
+      newLeft = Math.max(0, Math.min(newLeft, window.innerWidth  - el.offsetWidth));
+      newTop  = Math.max(0, Math.min(newTop,  window.innerHeight - el.offsetHeight));
+      el.style.left = `${newLeft}px`;
+      el.style.top  = `${newTop}px`;
     }
   });
 
   document.addEventListener("mouseup", () => {
     if (!pressed) return;
     pressed = false;
-    el.style.transition = "all 0.4s ease";
+    el.style.transition = "all 0.2s ease";
     el.__dragMoved = dragging;
     setTimeout(() => { el.__dragMoved = false; }, 0);
   });
 }
+
 
 
     
@@ -1132,29 +1180,6 @@ function scatterAllFoldersPercent(){
     }
   };
 
- 
-
-function centerWindow(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  const w = el.offsetWidth;
-  const h = el.offsetHeight;
-
-  el.style.position = "fixed";
-  el.style.left = `calc(50% - ${w / 2}px)`;
-  el.style.top = `calc(50% - ${h / 2}px)`;
-}
-
-// Center home window on load
-window.addEventListener("load", () => {
-  centerWindow("window-home");
-});
-
-// Keep it centered when resizing
-window.addEventListener("resize", () => {
-  centerWindow("window-home");
-});
 
 
   });
