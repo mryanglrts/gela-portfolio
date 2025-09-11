@@ -270,6 +270,30 @@ input:checked+.slider:before {
   animation: pop 0.3s ease;
 }
 
+/* Hide by default */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Show only on mobile */
+  #window-home .mobile-only {
+    display: block;
+    position: absolute;
+    top: 0.3rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-color, #fff);
+    cursor: pointer;
+    z-index: 9999;           /* sit above everything */
+    pointer-events: auto;    /* be sure taps land */
+  }
+}
+
+.hidden { display: none !important; }
+
 
 
 

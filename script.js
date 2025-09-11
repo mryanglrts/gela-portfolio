@@ -1178,8 +1178,26 @@ function scatterAllFoldersPercent(){
     }
   };
 
-
   
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("#window-home .close-btn");
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation(); // in case a drag/click handler is grabbing the event
+
+  const home = document.getElementById("window-home");
+  if (home) home.classList.add("hidden");
+});
+
+
+document.addEventListener("click", (e) => {
+  const angela = e.target.closest("#angela-illustration");
+  if (!angela) return;
+
+  const home = document.getElementById("window-home");
+  if (home) home.classList.remove("hidden");
+});
 
 
 
