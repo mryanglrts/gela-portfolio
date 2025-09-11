@@ -208,6 +208,24 @@ input:checked+.slider:before {
   padding: 2rem;
 }
 
+/* ✅ Desktop container should be relative so folders anchor correctly */
+#desktop {
+  position: relative;
+}
+
+/* ✅ Folder container fills the desktop on big screens */
+#folders {
+  position: absolute;  /* anchor to #desktop, not the page */
+  inset: 0;           /* top:0 right:0 bottom:0 left:0 */
+  z-index: 5;
+  pointer-events: none; /* wrapper re-enables clicks */
+}
+
+.folder-wrapper {
+  pointer-events: auto;
+}
+
+
 /* -------------------
    FOLDERS
 -------------------- */
@@ -2034,7 +2052,7 @@ img, .thumb { max-width: 100%; height: auto; }
 /* ===== DESKTOP FOLDER POSITIONING (percent-based) ===== */
 @media (min-width: 821px){
   #folders{
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
   }

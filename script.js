@@ -652,9 +652,9 @@ if (!sessionStorage.getItem("gela_tip_shown")) {
 
   // ---------- Folders data ----------
   const folderData = [
-    { id: "works",   label: "my works",   x: 100,  y: 150, content: getWorksContent() },
+    { id: "works",   label: "my works",   x: 75,  y: 15, content: getWorksContent() },
     {
-      id: "contact", label: "contact me", x: 150,  y: 400,
+      id: "contact", label: "contact me", x: 15,  y: 25,
       content: `
         <div class="contact-window">
           <h2 class="contact-title">i'd love to talk!</h2>
@@ -671,9 +671,9 @@ if (!sessionStorage.getItem("gela_tip_shown")) {
           <a href="mailto:mryangelaworks@gmail.com" class="contact-btn">send me an email!</a>
         </div>`
     },
-    { id: "links",   label: "my links",   x: 420,  y: 160, content: getLinksContent() },
+    { id: "links",   label: "my links",   x: 75,  y: 35, content: getLinksContent() },
     {
-      id: "about",   label: "about me",   x: 1600, y: 420,
+      id: "about",   label: "about me",   x: 15, y: 45,
       content: `
         <div class="about-angela-wrapper">
           <div class="about-header">
@@ -731,8 +731,8 @@ if (!sessionStorage.getItem("gela_tip_shown")) {
     {
       id: "resume",
       label: "resume",
-      x: 1500,
-      y: 220,
+      x: 75,
+      y: 55,
       content: `
         <div class="resume-window" style="text-align:center; padding:20px;">
           <p style="margin-bottom:12px;">thanks for checking me out ♡</p>
@@ -745,15 +745,15 @@ if (!sessionStorage.getItem("gela_tip_shown")) {
     {
       id: "faq",
       label: "faq",
-      x: 1500,
-      y: 560,
+      x: 15,
+      y: 65,
       content: getFaqContent()
     },
     {
       id: "guestbook",
       label: "message board",
-      x: 1600,
-      y: 80,
+      x: 75,
+      y: 75,
       content: `
         <div class="guestbook-root">
           <h2 style="margin:0 0 8px;">people say...♡</h2>
@@ -848,17 +848,43 @@ if (!sessionStorage.getItem("gela_tip_shown")) {
 
   // ---------- Create folder icons ----------
   if (folderContainer) {
+    const defaultPositions = {
+      // Left side folders
+      "contact": { x: 15, y: 20 },
+      "about": { x: 15, y: 45 },
+      "faq": { x: 15, y: 70 },
+      // Right side folders
+      "works": { x: 75, y: 15 },
+      "links": { x: 75, y: 35 },
+      "resume": { x: 75, y: 55 },
+      "guestbook": { x: 75, y: 75 }
+    };
+    
+    // Load saved positions from localStorage (only if they were scattered by clicking illustration)
+    const wasScattered = localStorage.getItem('foldersScattered') === 'true';
+    const savedPositions = wasScattered ? JSON.parse(localStorage.getItem('folderPositions') || '{}') : {};
+    
     folderData.forEach((folder) => {
       const folderWrapper = document.createElement("div");
       folderWrapper.classList.add("folder-wrapper");
       folderWrapper.style.position = isMobile() ? "relative" : "absolute";
-  if (!isMobile()) {
-  const parent = getContainerRect();
-  const seedX = pxToPct(folder.x, parent.width);
-  const seedY = pxToPct(folder.y, parent.height);
-
-  folderWrapper.dataset.x = isFinite(seedX) ? seedX.toFixed(2) : "5";
-  folderWrapper.dataset.y = isFinite(seedY) ? seedY.toFixed(2) : "5";
+      
+      if (!isMobile()) {
+        const parent = getContainerRect();
+        let x, y;
+        
+        if (wasScattered && savedPositions[folder.id]) {
+          // Use saved position if they were scattered
+          x = parseFloat(savedPositions[folder.id].x);
+          y = parseFloat(savedPositions[folder.id].y);
+        } else {
+          // Use default arranged position
+          x = defaultPositions[folder.id].x;
+          y = defaultPositions[folder.id].y;
+        }
+        
+        folderWrapper.dataset.x = isFinite(x) ? x.toFixed(2) : "5";
+        folderWrapper.dataset.y = isFinite(y) ? y.toFixed(2) : "5";
 
   applyFolderPercent(folderWrapper);
   requestAnimationFrame(() => clampFolderPercent(folderWrapper));
@@ -975,14 +1001,31 @@ const scatterFoldersIfDesktop = () => window.innerWidth > MOBILE_BP;
     if (f) openWindow(f.id, f.label, f.content);
   });
 
+function saveFolderPositions() {
+  if (isMobile()) return;
+  const positions = {};
+  document.querySelectorAll(".folder-wrapper").forEach(folder => {
+    positions[folder.dataset.fid] = {
+      x: folder.dataset.x,
+      y: folder.dataset.y
+    };
+  });
+  localStorage.setItem('folderPositions', JSON.stringify(positions));
+}
+
 function scatterAllFoldersPercent(){
+  if (isMobile()) return;
   const parent = getContainerRect();
   document.querySelectorAll(".folder-wrapper").forEach(folder => {
     folder.classList.add("show");
     const rect = folder.getBoundingClientRect();
-    const xMax = Math.max(0, 100 - pxToPct(rect.width,  parent.width));
-    const yMax = Math.max(0, 100 - pxToPct(rect.height, parent.height));
-    const randX = Math.random() * xMax;
+    
+    // Calculate maximum positions while keeping folders fully visible
+    const xMax = Math.max(0, 90 - pxToPct(rect.width, parent.width));
+    const yMax = Math.max(0, 90 - pxToPct(rect.height, parent.height));
+    
+    // Generate random positions between 5% and max%
+    const randX = Math.random() * (xMax - 5) + 5;
     const randY = Math.random() * yMax;
     folder.dataset.x = randX.toFixed(2);
     folder.dataset.y = randY.toFixed(2);
@@ -1161,6 +1204,12 @@ function scatterAllFoldersPercent(){
     pressed = false;
     el.style.transition = "all 0.2s ease";
     el.__dragMoved = dragging;
+    
+    // Save positions after dragging folders
+    if (isFolder && dragging) {
+      saveFolderPositions();
+    }
+    
     setTimeout(() => { el.__dragMoved = false; }, 0);
   });
 }
