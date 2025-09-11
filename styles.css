@@ -275,22 +275,47 @@ input:checked+.slider:before {
   display: none;
 }
 
+/* make the window a positioning context (good anyway) */
+#window-home { position: relative; }
+
+/* header: flex so title on left, X on right; reserve space for the X */
+#window-home .window-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem;
+  padding-right: 2.25rem;   /* keeps title from colliding with the X */
+}
+
+/* hidden by default on desktop */
+.mobile-only { display: none; }
+
 @media (max-width: 768px) {
-  /* Show only on mobile */
-  #window-home .mobile-only {
-    display: block;
+  /* show X only on mobile */
+  #window-home .close-btn.mobile-only {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: absolute;
-    top: 0.3rem;
-    right: 0.5rem;
-    background: none;
+    top: 50%;
+    right: .5rem;
+    transform: translateY(-50%);  /* perfectly vertical-centered */
+    width: 28px;
+    height: 28px;
+    line-height: 1;
+    background: transparent;
     border: none;
-    font-size: 1.5rem;
-    color: var(--text-color, #fff);
+    font-size: 20px;
     cursor: pointer;
-    z-index: 9999;           /* sit above everything */
-    pointer-events: auto;    /* be sure taps land */
+    z-index: 5;
+    -webkit-tap-highlight-color: transparent;
   }
 }
+
+/* utility if you don't have it yet */
+.hidden { display: none !important; }
+
 
 .hidden { display: none !important; }
 
