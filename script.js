@@ -592,7 +592,7 @@ if (!sessionStorage.getItem("gela_tip_shown")) {
            {"src":"images/eulclavie/3.png","title":"Hiring Marketing Post"},
            {"src":"images/eulclavie/4.png","title":"EulClavie Ad Flyer for Email Marketing"},
            {"src":"images/eulclavie/5.png","title":"Hiring Cold Callers Post"},
-           {"src":"images/eulclavie/6.png","title":"Hiring Data Virtual Assistants Post"},
+           {"src":"images/eulclavie/6.png","title":"Hiring Data Virtual Assistants Post"}
          ]'>
       <div class="thumb" style="background-image:url(images/eulclavie/eulclavie.png); background-size:cover; background-position:center;"></div>
       <div class="card-title">EulClavie
